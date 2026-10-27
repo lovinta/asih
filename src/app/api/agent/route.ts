@@ -4,8 +4,6 @@
 import { runFlow } from "@/lib/agent/runFlow";
 import type { FlowInput, FlowName, HistoryItem, Lang } from "@/lib/agent/types";
 
-export const runtime = "nodejs";
-
 function isFlow(value: unknown): value is FlowName {
   return value === "A" || value === "B" || value === "C";
 }

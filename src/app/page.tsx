@@ -1,69 +1,166 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+// Home screen and navigation: header with EN | ES toggle and the
+// always-visible Get-help button, offline demo banner, three big flow
+// buttons, "Delete everything" (with a confirm), and the data-notice gate
+// that runs before the first upload/share/send.
+import { useCallback, useRef, useState } from "react";
+import FlowA from "@/components/FlowA";
+import FlowB from "@/components/FlowB";
+import FlowC from "@/components/FlowC";
+import GetHelp from "@/components/GetHelp";
+import MockBanner from "@/components/MockBanner";
+import DataNoticeDialog, { isNoticeAccepted } from "@/components/DataNotice";
+import { LangProvider, useLang } from "@/components/Lang";
+
+type Screen = "home" | "help" | "A" | "B" | "C";
+
+const OWNED_PREFIX = "oah.";
+
+function clearAppStorage(): void {
+  const owned: string[] = [];
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i);
+    if (key && key.startsWith(OWNED_PREFIX)) owned.push(key);
+  }
+  for (const key of owned) window.localStorage.removeItem(key);
+}
+
+function App() {
+  const { lang, t, setLang } = useLang();
+  const [screen, setScreen] = useState<Screen>("home");
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const pending = useRef<(() => void) | null>(null);
+
+  // Gate every upload/share/send: continue only after "I understand".
+  const needGate = useCallback((run: () => void) => {
+    if (isNoticeAccepted()) {
+      run();
+    } else {
+      pending.current = run;
+      setNoticeOpen(true);
+    }
+  }, []);
+
+  const acknowledgeNotice = useCallback(() => {
+    setNoticeOpen(false);
+    const run = pending.current;
+    pending.current = null;
+    if (run) run();
+  }, []);
+
+  const openHelp = useCallback(() => setScreen("help"), []);
+
+  const deleteEverything = useCallback(() => {
+    if (!window.confirm(t.home.deleteConfirm)) return;
+    clearAppStorage();
+    // Keep the current language active after clearing.
+    setLang(lang);
+    setScreen("home");
+  }, [lang, setLang, t.home.deleteConfirm]);
+
+  return (
+    <div>
+      <header className="topbar">
+        <p className="app-title">{t.appTitle}</p>
+        <div
+          className="lang-toggle"
+          role="group"
+          aria-label={t.languageToggle}
+        >
+          <button
+            type="button"
+            aria-pressed={lang === "en"}
+            className={lang === "en" ? "selected" : ""}
+            onClick={() => setLang("en")}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            aria-pressed={lang === "es"}
+            className={lang === "es" ? "selected" : ""}
+            onClick={() => setLang("es")}
+          >
+            ES
+          </button>
+        </div>
+        <button type="button" className="help-button" onClick={openHelp}>
+          {t.getHelpButton}
+        </button>
+      </header>
+
+      <MockBanner />
+
+      <main className="container">
+        {screen === "home" && (
+          <section>
+            <p className="big-text">{t.home.subtitle}</p>
+            <div className="button-column">
+              <button
+                type="button"
+                className="primary big-button"
+                onClick={() => setScreen("A")}
+              >
+                {t.home.appointmentLetter}
+              </button>
+              <button
+                type="button"
+                className="primary big-button"
+                onClick={() => setScreen("B")}
+              >
+                {t.home.findGroup}
+              </button>
+              <button
+                type="button"
+                className="primary big-button"
+                onClick={() => setScreen("C")}
+              >
+                {t.home.checkAd}
+              </button>
+            </div>
+            <div className="button-column">
+              <button type="button" onClick={() => setNoticeOpen(true)}>
+                {t.home.readNoticeAgain}
+              </button>
+              <button type="button" className="danger" onClick={deleteEverything}>
+                {t.deleteEverything}
+              </button>
+            </div>
+          </section>
+        )}
+
+        {screen === "help" && <GetHelp onBack={() => setScreen("home")} />}
+
+        {(screen === "A" || screen === "B" || screen === "C") && (
+          <div>
+            <button type="button" onClick={() => setScreen("home")}>
+              {t.back}
+            </button>
+            {screen === "A" && (
+              <FlowA lang={lang} needGate={needGate} openHelp={openHelp} />
+            )}
+            {screen === "B" && (
+              <FlowB lang={lang} needGate={needGate} openHelp={openHelp} />
+            )}
+            {screen === "C" && (
+              <FlowC lang={lang} needGate={needGate} openHelp={openHelp} />
+            )}
+          </div>
+        )}
+      </main>
+
+      {noticeOpen && (
+        <DataNoticeDialog lang={lang} onAcknowledge={acknowledgeNotice} />
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <LangProvider>
+      <App />
+    </LangProvider>
   );
 }

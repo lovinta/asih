@@ -3,8 +3,6 @@
 import { transcribe } from "@/lib/meta/transcribe";
 import type { Lang } from "@/lib/agent/types";
 
-export const runtime = "nodejs";
-
 export async function POST(request: Request) {
   let form: FormData;
   try {
