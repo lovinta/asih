@@ -12,7 +12,10 @@ export const en = {
     "payment-risk": "Requests risky payment", "asks-personal-details": "Asks for personal or bank details",
     "unusual-url": "Unusual web address",
   },
-  appTitle: "Older adults' helper (working name)",
+  appTitle: "Asih",
+  intro: "Hello, I'm Asih, an AI helper. I'm not a person and not a doctor. You decide every step.",
+  dataNoticeLeadIn: "Before you share anything, here is what happens to it.",
+  avatarAlt: "Asih (AI helper)",
   common: {
     close: "Close",
     startOver: "Start over",
@@ -55,7 +58,7 @@ export const en = {
     neverCalls: "The app never calls by itself.",
   },
   confirm: {
-    title: "Please confirm, one at a time",
+    title: "I read this. Is it right?",
     confirmButton: "Confirm",
     changeButton: "Change",
     editLabel: "Correct value",
@@ -122,13 +125,14 @@ export const en = {
     sharedSource: "Listing shared by the person",
     calendarTypes: ["Public library", "Senior center", "Parks department"],
     inviteTemplate:
-      "Hello{names}! Would you like to join me at {event} on {date} at {time}? We meet at {place}. Let me know!",
+      "Hello{names}. Would you like to join me at {event} on {date} at {time}? We meet at {place}. Let me know.",
     meetTipsTitle: "Meeting new people",
     meetTips: "Meet in a public place. Tell a person you trust. You can leave at any time.",
     whatsappGroupNote:
       "To make a WhatsApp group: open WhatsApp, tap New group, add the people you choose, and send your invitation.",
   },
   flowC: {
+    adIntro: "Here is what I can see in this ad.",
     title: "Health-scam and ad check",
     shareAdHint: "Share an ad screenshot or paste the ad text.",
     adTextLabel: "Or paste the ad text here",

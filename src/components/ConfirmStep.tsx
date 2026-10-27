@@ -43,8 +43,8 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
     const spoken = current.readable
       ? `${labelField(current.field, t.fieldKinds)}: ${current.value}`
       : `${labelField(current.field, t.fieldKinds)}: ${unreadableNote}`;
-    readAloud(spoken, lang);
-  }, [current, lang, unreadableNote, t.fieldKinds]);
+    readAloud(`${t.confirm.title} ${spoken}`, lang);
+  }, [current, lang, unreadableNote, t.confirm.title, t.fieldKinds]);
 
   const confirmCurrent = () => {
     if (!current) return;

@@ -1,6 +1,12 @@
-# Older adults' helper (working name)
+# Asih
 
 An agent for older adults' needs and quality of life. It is not a chatbot: it has no open-ended chat mode. The demo shows three fixed flows that end with an action the person chooses:
+
+## Persona: Asih
+
+Asih is a plain-spoken AI helper. Asih is honest about being an AI, not a person or doctor. The person decides every step. Use short, plain sentences, with care and patience. Do not use pet names or exclamation marks. In Spanish, use formal “usted.”
+
+The abstract avatar is a placeholder. TODO: replace it with the final avatar generated with Muse Image (`muse-image-1.0`) once the app has a Meta API key.
 
 - **Appointment help:** read an example letter, confirm each extracted item, then save the visit or download a calendar file.
 - **Find a group:** review an example community event, confirm when and where it meets, plan transportation, and edit an invitation.

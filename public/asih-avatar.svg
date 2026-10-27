@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Abstract Asih mark">
+  <!-- TODO: replace with final avatar generated with Muse Image (muse-image-1.0) once the app has a Meta API key -->
+  <rect width="48" height="48" rx="12" fill="#fff"/>
+  <path d="M9 24c0-8.3 6.7-15 15-15h5a10 10 0 0 1 0 20h-9" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+  <path d="M39 24c0 8.3-6.7 15-15 15h-5a10 10 0 0 1 0-20h9" fill="none" stroke="#005a9c" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -14,7 +14,8 @@ describe("ics builder", () => {
     expect(ics).toContain("DTSTAMP:");
     expect(ics).toContain("DTSTART:20261110T143000Z");
     expect(ics).toContain("SUMMARY:Clinic visit");
-    expect(ics).toContain("PRODID:-//older-adults-helper//EN");
+    expect(ics).toContain("PRODID:-//asih//EN");
+    expect(ics).toMatch(/UID:[^\r\n]+@asih/);
     expect(ics).toContain("LOCATION:Riverside Health Center");
     expect(ics).toContain("END:VEVENT");
     expect(ics).toContain("END:VCALENDAR");

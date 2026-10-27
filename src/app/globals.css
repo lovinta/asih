@@ -41,6 +41,24 @@ body {
   flex: 1 1 100%;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1 1 100%;
+}
+
+.brand-avatar {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+}
+
+.intro-text {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: 1.25;
+}
+
 .lang-toggle {
   display: flex;
   gap: 0.25rem;

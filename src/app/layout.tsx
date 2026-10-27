@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  // TODO: name to be chosen by Vinta.
-  title: "Older adults' helper (working name)",
+  title: "Asih — an AI helper for daily life",
   description:
     "Helper for older adults: appointment letters, finding groups, and checking ads.",
 };

@@ -5,11 +5,13 @@
 // buttons, "Delete everything" (with a confirm), and the data-notice gate
 // that runs before the first upload/share/send.
 import { useCallback, useRef, useState } from "react";
+import Image from "next/image";
 import FlowA from "@/components/FlowA";
 import FlowB from "@/components/FlowB";
 import FlowC from "@/components/FlowC";
 import GetHelp from "@/components/GetHelp";
 import MockBanner from "@/components/MockBanner";
+import SpeechControls from "@/components/SpeechControls";
 import DataNoticeDialog, { isNoticeAccepted } from "@/components/DataNotice";
 import { LangProvider, useLang } from "@/components/Lang";
 
@@ -62,7 +64,10 @@ function App() {
   return (
     <div>
       <header className="topbar">
-        <p className="app-title">{t.appTitle}</p>
+        <div className="brand">
+          <Image className="brand-avatar" src="/asih-avatar.svg" alt={t.avatarAlt} width={48} height={48} priority />
+          <p className="app-title">{t.appTitle}</p>
+        </div>
         <div
           className="lang-toggle"
           role="group"
@@ -95,6 +100,8 @@ function App() {
       <main className="container">
         {screen === "home" && (
           <section>
+            <p className="big-text intro-text">{t.intro}</p>
+            <SpeechControls text={t.intro} lang={lang} />
             <p className="big-text">{t.home.subtitle}</p>
             <div className="button-column">
               <button

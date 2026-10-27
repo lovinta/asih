@@ -198,6 +198,7 @@ export default function FlowC({ lang, needGate, openHelp }: FlowProps) {
           )}
 
           <h3>{t.flowC.importantTitle}</h3>
+          <p className="big-text">{t.flowC.adIntro}</p>
           <p data-testid="fixed-scam-wording" className="fixed-wording">
             {scamMessage(result.cues.map((cue) => cue.cue), lang)}
           </p>

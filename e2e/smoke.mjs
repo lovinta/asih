@@ -52,6 +52,8 @@ try {
   page.setDefaultTimeout(timeout);
   page.setDefaultNavigationTimeout(timeout);
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout });
+  await page.locator(".intro-text").getByText("Hello, I'm Asih, an AI helper. I'm not a person and not a doctor. You decide every step.").waitFor({ state: "visible", timeout });
+  await page.getByRole("img", { name: "Asih (AI helper)" }).waitFor({ state: "visible", timeout });
   await page.getByTestId("flow-a").click({ timeout });
   await page.getByRole("button", { name: "Use example letter" }).click({ timeout });
   await page.getByTestId("data-notice").waitFor({ state: "visible", timeout });

@@ -16,7 +16,11 @@ export const es: Strings = {
     "payment-risk": "Solicita un pago arriesgado", "asks-personal-details": "Pide datos personales o bancarios",
     "unusual-url": "Dirección web inusual",
   },
-  appTitle: "Ayudante para personas mayores (nombre provisional)",
+  appTitle: "Asih",
+  // TODO: Spanish needs fluent-speaker check; "una asistente" vs "un asistente" is a choice to confirm.
+  intro: "Hola, soy Asih, una asistente de inteligencia artificial. No soy una persona ni un médico. Usted decide cada paso.",
+  dataNoticeLeadIn: "Antes de compartir algo, le explico qué pasa con eso.",
+  avatarAlt: "Asih (asistente de IA)",
   common: {
     close: "Cerrar",
     startOver: "Empezar de nuevo",
@@ -59,7 +63,7 @@ export const es: Strings = {
     neverCalls: "La aplicación nunca llama por sí sola.",
   },
   confirm: {
-    title: "Por favor confirme, uno a la vez",
+    title: "Leí esto. ¿Es correcto?",
     confirmButton: "Confirmar",
     changeButton: "Cambiar",
     editLabel: "Valor correcto",
@@ -126,13 +130,14 @@ export const es: Strings = {
     sharedSource: "Anuncio compartido por la persona",
     calendarTypes: ["Biblioteca pública", "Centro de personas mayores", "Departamento de parques"],
     inviteTemplate:
-      "¡Hola{names}! ¿Le gustaría acompañarme a {event} el {date} a las {time}? Nos reunimos en {place}. ¡Avíseme!",
+      "Hola{names}. ¿Le gustaría acompañarme a {event} el {date} a las {time}? Nos reunimos en {place}. Avíseme.",
     meetTipsTitle: "Conocer gente nueva",
     meetTips: "Reúnase en un lugar público. Avise a una persona de confianza. Puede irse en cualquier momento.",
     whatsappGroupNote:
       "Para crear un grupo de WhatsApp: abra WhatsApp, toque Nuevo grupo, agregue a las personas que elija y envíe su invitación.",
   },
   flowC: {
+    adIntro: "Esto es lo que veo en este anuncio.",
     title: "Revisión de anuncios y estafas de salud",
     shareAdHint: "Comparta una captura del anuncio o pegue el texto del anuncio.",
     adTextLabel: "O pegue aquí el texto del anuncio",
@@ -144,7 +149,7 @@ export const es: Strings = {
     cuesTitle: "Señales de advertencia que puedo ver",
     whyAdTitle: "¿Por qué veo este anuncio?",
     draftTitle: "Pregunte a alguien de confianza",
-    draftDefault: "¿Puedes mirar este anuncio conmigo?",
+    draftDefault: "¿Puede mirar este anuncio conmigo?",
     unknownAdvertiser: "este anunciante",
     draftTemplate:
       "¿Puede mirar este anuncio conmigo? Es de {advertiser}. Quiero una segunda opinión antes de pagar o compartir datos.",

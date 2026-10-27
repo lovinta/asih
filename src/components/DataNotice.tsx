@@ -41,12 +41,13 @@ export default function DataNoticeDialog({
 
   // Read the notice aloud as soon as it is shown, in the current language.
   useEffect(() => {
-    readAloud(`${t.dataNotice.title}. ${body}`, lang);
-  }, [body, lang, t.dataNotice.title]);
+    readAloud(`${t.dataNoticeLeadIn} ${t.dataNotice.title}. ${body}`, lang);
+  }, [body, lang, t.dataNotice.title, t.dataNoticeLeadIn]);
 
   return (
     <div data-testid="data-notice" className="dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="notice-title">
       <div className="dialog">
+        <p className="big-text">{t.dataNoticeLeadIn}</p>
         <h2 id="notice-title">{t.dataNotice.title}</h2>
         <p className="big-text">{body}</p>
         <button
