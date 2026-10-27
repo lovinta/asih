@@ -10,6 +10,7 @@ import type { FlowInput, Lang, Step } from "@/lib/agent/types";
 import type { FlowCResult } from "@/lib/agent/runFlow";
 import { resizeImageFile } from "@/lib/images";
 import { whatsappShareUrl } from "@/lib/links";
+import { scamMessage } from "@/lib/safety/scamWording";
 import SpeechControls from "./SpeechControls";
 import TracePanel from "./TracePanel";
 import { useLang } from "./Lang";
@@ -186,7 +187,7 @@ export default function FlowC({ lang, needGate, openHelp }: FlowProps) {
           {result.cues.length === 0 ? (
             <p className="big-text">{t.safety.noCuesSuffix}</p>
           ) : (
-            <ul className="confirm-list">
+            <ul data-testid="scam-cues" className="confirm-list">
               {result.cues.map((cue, i) => (
                 <li key={`${cue.cue}-${i}`}>
                   <strong>{cue.cue}:</strong> <q>{cue.evidence}</q>
@@ -196,8 +197,10 @@ export default function FlowC({ lang, needGate, openHelp }: FlowProps) {
           )}
 
           <h3>{t.flowC.importantTitle}</h3>
-          <p className="fixed-wording">{result.message}</p>
-          <SpeechControls text={result.message} lang={lang} />
+          <p data-testid="fixed-scam-wording" className="fixed-wording">
+            {scamMessage(result.cues.map((cue) => cue.cue), lang)}
+          </p>
+          <SpeechControls text={scamMessage(result.cues.map((cue) => cue.cue), lang)} lang={lang} />
 
           <h3>{t.flowC.whyAdTitle}</h3>
           {explanation?.steps && (

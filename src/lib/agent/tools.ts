@@ -211,9 +211,9 @@ const CUE_PATTERNS: { cue: string; pattern: RegExp }[] = [
 
 function quoteEvidence(text: string, match: RegExpMatchArray): string {
   const idx = match.index ?? 0;
-  const start = Math.max(0, idx - 20);
-  const end = Math.min(text.length, idx + match[0].length + 20);
-  return text.slice(start, end).trim();
+  const lineStart = text.lastIndexOf("\n", idx - 1) + 1;
+  const newline = text.indexOf("\n", idx);
+  return text.slice(lineStart, newline === -1 ? text.length : newline).trim();
 }
 
 export function findScamCues(adText: string): ScamCue[] {

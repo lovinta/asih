@@ -10,7 +10,7 @@ export const EXAMPLE_LETTER_TEXT = [
   "Riverside Community Health Center",
   "12 Park Avenue, Riverton",
   "Dear Mrs. Elena Rivera,",
-  "You have a visit on Tuesday, November 4, 2026 at 10:30 AM",
+  "You have a visit on Tuesday, November 10, 2026 at 10:30 AM",
   "with Dr. Patel at Riverside Community Health Center, Room 204.",
   "Please bring your photo ID, your medication list, and your insurance card.",
   "Questions? Call us at (555) 014-2200.",
@@ -37,9 +37,9 @@ export interface LetterField {
 export const EXAMPLE_LETTER_FIELDS: LetterField[] = [
   {
     kind: "date",
-    value: "Tuesday, November 4, 2026",
+    value: "Tuesday, November 10, 2026",
     readable: true,
-    evidence_quote: "You have a visit on Tuesday, November 4, 2026 at 10:30 AM",
+    evidence_quote: "You have a visit on Tuesday, November 10, 2026 at 10:30 AM",
   },
   {
     kind: "time",

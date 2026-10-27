@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Older adults' helper (working name)
 
-## Getting Started
+An agent for older adults' needs and quality of life. It is not a chatbot: it has no open-ended chat mode. The demo shows three fixed flows that end with an action the person chooses:
 
-First, run the development server:
+- **Appointment help:** read an example letter, confirm each extracted item, then save the visit or download a calendar file.
+- **Find a group:** review an example community event, confirm when and where it meets, plan transportation, and edit an invitation.
+- **Check an ad:** review quoted warning cues, learn how to inspect ad settings and find the advertiser in Meta's Ad Library, then choose whether to share a note.
 
-```bash
+All offline example content is synthetic and labeled **EXAMPLE (synthetic data)**.
+
+## Safety design
+
+- No medical advice. A red-flag pre-screen redirects urgent phrases to the Get help screen before an agent runs. The app never calls emergency services by itself.
+- Scam wording is fixed in code. The agent can list cues with exact ad text evidence but cannot give an ad a safe/scam verdict.
+- Dates, times, places, and names must be confirmed one at a time before they can be saved, exported, or used in a draft.
+- Before the first photo, voice note, or message is sent, the app displays and reads aloud this notice and requires acknowledgment:
+
+  > Your saved items stay on this phone. To read a photo or voice note, it is sent to Meta's AI service. Meta says it does not use it to train its AI. This app tells Meta not to store its answers. Meta may still keep what is sent as needed to run the service, follow the law, and check for misuse and safety; it does not say for how many days. Delete everything removes what is saved on this phone. It cannot remove what Meta may have kept.
+
+- An output guard checks content before it is shown. Live calls have a $10/day spend guard.
+
+## Models and tools
+
+The live agent loop uses `muse-spark-1.3` through the Responses API for tool use, vision, and an output-guard check. `muse-wonder-1.0` gets one retry for unreadable images only. Voice transcription uses `muse-voice-transcribe-1.0` at `/v1/asr/transcribe`.
+
+Calls set `store: false` and request encrypted reasoning content. The app uses stateless encrypted reasoning replay: it resends its own input-item history, with no `previous_response_id` or conversation. These controls do not determine all service retention. Meta may still keep submitted content as needed to provide the service, comply with law, and detect abuse or safety issues under [Terms section 4.4](https://www.meta.ai/terms).
+
+The ad flow links to Meta's transparency tools: [Why am I seeing this ad?](https://www.facebook.com/help/), [Accounts Center ad preferences](https://www.facebook.com/help/943858526073065), and [Ad Library](https://www.facebook.com/ads/library/). Invitations use WhatsApp click-to-chat (`https://wa.me/?text=...`); the person chooses recipients and sends. This project was built with Muse Code.
+
+## Setup
+
+```sh
+npm install
+cp .env.example .env.local
+# Optionally set META_API_KEY in .env.local for live mode.
+# Set MOCK_MODE=1 for the deterministic offline demo.
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run checks and the browser smoke test:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+npm test
+npm run build && npm run e2e
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The browser test expects a production build to exist and system Chrome at `/usr/bin/google-chrome`. The smoke test runs against the deterministic mock mode and saves screenshots in `e2e/screenshots/`.
 
-## Learn More
+## Privacy
 
-To learn more about Next.js, take a look at the following resources:
+No model call asks the API to store its response (`store: false`). The app replays encrypted reasoning statelessly and never uses `previous_response_id` or a conversation. The data notice explains what Meta may still retain under Terms section 4.4. Saved visits, questions, and notice acknowledgment stay in this browser's localStorage; “Delete everything” clears this app's saved entries on this phone.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Prior work disclosure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+TODO (Vinta): state where the new work starts and any prior work
 
-## Deploy on Vercel
+Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Known limits and TODOs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Spanish needs a fluent-speaker check.
+- Confirm the transit link provider (Google Maps) with Vinta.
+- Voice-note flow and private participation note are not built in the UI yet.
+- Indonesian support is deferred.
+- An evaluation set is not built yet.
+- There is no deployment.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

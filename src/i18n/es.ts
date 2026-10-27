@@ -5,7 +5,7 @@ import type { en } from "./en";
 type Strings = typeof en;
 
 export const es: Strings = {
-  appTitle: "Ayuda Comunitaria",
+  appTitle: "Ayudante para personas mayores (nombre provisional)",
   common: {
     close: "Cerrar",
     startOver: "Empezar de nuevo",

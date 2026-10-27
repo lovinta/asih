@@ -343,6 +343,7 @@ export default function FlowB({ lang, needGate, openHelp }: FlowProps) {
           <label className="field-label">
             {t.flowB.inviteTitle}
             <textarea
+              data-testid="invite-draft"
               rows={5}
               value={inviteDraft}
               onChange={(event) => setInviteDraft(event.target.value)}

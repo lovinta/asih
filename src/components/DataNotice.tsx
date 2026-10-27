@@ -45,12 +45,13 @@ export default function DataNoticeDialog({
   }, [body, lang, t.dataNotice.title]);
 
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="notice-title">
+    <div data-testid="data-notice" className="dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="notice-title">
       <div className="dialog">
         <h2 id="notice-title">{t.dataNotice.title}</h2>
         <p className="big-text">{body}</p>
         <button
           type="button"
+          data-testid="acknowledge-notice"
           className="primary"
           onClick={() => {
             rememberNoticeAccepted();

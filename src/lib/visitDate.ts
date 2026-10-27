@@ -1,5 +1,5 @@
 // Parse the confirmed visit/event date + time strings (e.g. "Tuesday,
-// November 4, 2026" and "10:30 AM") into a local Date for the .ics download.
+// November 10, 2026" and "10:30 AM") into a local Date for the .ics download.
 // Pure and React-free: covered by visitDate.test.ts. Returns null when the
 // strings do not contain a recognizable date and time.
 const MONTHS: Record<string, number> = {

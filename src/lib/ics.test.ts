@@ -5,15 +5,16 @@ describe("ics builder", () => {
   it("emits a CRLF VCALENDAR/VEVENT with UID, DTSTAMP, DTSTART, SUMMARY", () => {
     const ics = buildICS({
       title: "Clinic visit",
-      start: new Date(Date.UTC(2026, 10, 4, 14, 30, 0)),
+      start: new Date(Date.UTC(2026, 10, 10, 14, 30, 0)),
       location: "Riverside Health Center",
     });
     expect(ics).toContain("BEGIN:VCALENDAR");
     expect(ics).toContain("BEGIN:VEVENT");
     expect(ics).toContain("UID:");
     expect(ics).toContain("DTSTAMP:");
-    expect(ics).toContain("DTSTART:20261104T143000Z");
+    expect(ics).toContain("DTSTART:20261110T143000Z");
     expect(ics).toContain("SUMMARY:Clinic visit");
+    expect(ics).toContain("PRODID:-//older-adults-helper//EN");
     expect(ics).toContain("LOCATION:Riverside Health Center");
     expect(ics).toContain("END:VEVENT");
     expect(ics).toContain("END:VCALENDAR");

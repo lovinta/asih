@@ -29,14 +29,15 @@ export function formatDateTimeUTC(date: Date): string {
 
 function makeUid(): string {
   const rand = Math.random().toString(36).slice(2, 10);
-  return `${Date.now()}-${rand}@community-helper`;
+  return `${Date.now()}-${rand}@older-adults-helper`;
 }
 
 export function buildICS(event: IcsEventInput): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Community Helper//EN",
+    // TODO: name to be chosen by Vinta.
+    "PRODID:-//older-adults-helper//EN",
     "BEGIN:VEVENT",
     `UID:${makeUid()}`,
     `DTSTAMP:${formatDateTimeUTC(new Date())}`,

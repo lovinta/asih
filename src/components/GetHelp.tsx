@@ -17,7 +17,7 @@ export default function GetHelp({ onBack }: { onBack: () => void }) {
       <h2>{t.getHelp.title}</h2>
       <p className="big-text">{t.getHelp.subtitle}</p>
       <div className="button-column">
-        <a className="button-link primary" href={EMERGENCY_US}>
+        <a data-testid="call-911" className="button-link primary" href={EMERGENCY_US}>
           {t.getHelp.call911}
         </a>
         <a className="button-link" href={EMERGENCY_INDONESIA_GENERAL}>

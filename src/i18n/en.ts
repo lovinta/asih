@@ -1,7 +1,7 @@
 // All English UI strings for the three flows. src/i18n/es.ts must keep
 // identical keys (checked by src/i18n/parity.test.ts).
 export const en = {
-  appTitle: "Community Helper",
+  appTitle: "Older adults' helper (working name)",
   common: {
     close: "Close",
     startOver: "Start over",

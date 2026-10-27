@@ -111,6 +111,10 @@ describe("Flow C (ad check)", () => {
     expect(c.cues.length).toBeGreaterThan(0);
     // Every cue carries the exact quoted text as evidence, no verdict.
     for (const cue of c.cues) expect(cue.evidence.length).toBeGreaterThan(0);
+    expect(c.cues.find((cue) => cue.cue === "urgency")?.evidence).toBe("Only 3 left in stock. ACT NOW!");
+    expect(c.cues.find((cue) => cue.cue === "too-good-claim")?.evidence).toBe(
+      "JOINT PAIN GONE IN 7 DAYS!",
+    );
     expect(c.message).not.toMatch(/this is safe/i);
     expect(c.message).not.toMatch(/this is a scam/i);
   });

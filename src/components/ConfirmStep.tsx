@@ -78,7 +78,7 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
             </li>
           ))}
         </ul>
-        <button type="button" className="primary" onClick={() => onDone(state)}>
+        <button type="button" data-testid="confirm-continue" className="primary" onClick={() => onDone(state)}>
           {t.confirm.continueButton}
         </button>
       </section>
@@ -104,13 +104,14 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
           <label className="field-label">
             {t.confirm.editLabel}
             <input
+              data-testid="confirm-edit"
               type="text"
               value={editValue}
               onChange={(event) => setEditValue(event.target.value)}
             />
           </label>
           <div className="button-row">
-            <button type="button" className="primary" onClick={saveEdit}>
+            <button type="button" data-testid="save-edit" className="primary" onClick={saveEdit}>
               {t.confirm.saveEdit}
             </button>
           </div>
@@ -119,6 +120,7 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
         <div className="button-row">
           <button
             type="button"
+            data-testid="confirm-item"
             className="primary"
             onClick={confirmCurrent}
             disabled={needsChange}
@@ -126,7 +128,7 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
           >
             {t.confirm.confirmButton}
           </button>
-          <button type="button" onClick={startEdit}>
+          <button type="button" data-testid="change-item" onClick={startEdit}>
             {t.confirm.changeButton}
           </button>
         </div>

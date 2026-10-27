@@ -17,7 +17,7 @@ export const EXAMPLE_EVENT: ExampleEvent = {
   label: EXAMPLE_LABEL,
   name: "Riverside Morning Walkers — EXAMPLE",
   source: "Example community board listing (synthetic)",
-  date: "Saturday, November 8, 2026",
+  date: "Saturday, November 7, 2026",
   time: "9:00 AM",
   place: "Riverside Park main gate, Riverton",
   bring: [

@@ -85,7 +85,7 @@ function App() {
             ES
           </button>
         </div>
-        <button type="button" className="help-button" onClick={openHelp}>
+        <button type="button" data-testid="get-help" className="help-button" onClick={openHelp}>
           {t.getHelpButton}
         </button>
       </header>
@@ -99,6 +99,7 @@ function App() {
             <div className="button-column">
               <button
                 type="button"
+                data-testid="flow-a"
                 className="primary big-button"
                 onClick={() => setScreen("A")}
               >
@@ -106,6 +107,7 @@ function App() {
               </button>
               <button
                 type="button"
+                data-testid="flow-b"
                 className="primary big-button"
                 onClick={() => setScreen("B")}
               >
@@ -113,6 +115,7 @@ function App() {
               </button>
               <button
                 type="button"
+                data-testid="flow-c"
                 className="primary big-button"
                 onClick={() => setScreen("C")}
               >
