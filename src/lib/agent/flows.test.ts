@@ -1,11 +1,20 @@
 // End-to-end flow tests in mock mode through runFlow: the real agent loop,
 // tools, guards, and trace all run with no key and no network.
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
-import { runFlow } from "./runFlow";
+import { runFlow, fillArgs, resolveFlowCMessage, type Ctx } from "./runFlow";
 import type { FlowCResult, FlowAResult, FlowBResult } from "./runFlow";
-import { FIXED_SCAM_WORDING_EN } from "../safety/scamWording";
+import { executeTool } from "./tools";
+import {
+  FIXED_SCAM_WORDING_EN,
+  FIXED_SCAM_WORDING_ES,
+  NO_CUES_SUFFIX_EN,
+} from "../safety/scamWording";
 import { PROMPT_INJECTION_AD_TEXT } from "@/fixtures/injectionAd";
 import { EXAMPLE_AD_TEXT } from "@/fixtures/ad";
+import { createConfirmState, confirmItem } from "../confirm";
+import { ACCOUNTS_CENTER_AD_PREFS_URL } from "../links";
+import { es as esStrings } from "@/i18n/es";
+import { en as enStrings } from "@/i18n/en";
 import { isValidReplayOrder } from "./types";
 
 const OLD_ENV = { ...process.env };
@@ -59,7 +68,29 @@ describe("Flow B (find a group)", () => {
     );
     const b = result as FlowBResult;
     expect(b.kind).toBe("B");
-    expect(b.ics).toContain("BEGIN:VEVENT");
+    // No .ics before confirmation: the UI exports after every item confirms.
+    expect(b.ics).toBeNull();
+    // The event's date/time/place come back as a ConfirmState like Flow A.
+    expect(b.event?.name).toContain("Riverside Morning Walkers");
+    expect(b.confirm.items.map((i) => i.field)).toEqual(["date", "time", "place"]);
+    expect(b.confirm.items.every((i) => i.status === "pending")).toBe(true);
+    expect(b.confirm.items.find((i) => i.field === "date")?.value).toBe(
+      b.event?.date,
+    );
+  });
+
+  it("uses Spanish strings for Spanish plan and invite output", async () => {
+    const { result } = await runFlow(
+      "B",
+      { interest: "walking", place: "Riverton" },
+      "es",
+    );
+    const b = result as FlowBResult;
+    const plan = b.plan as { rideNote: string; meetTips: string };
+    expect(plan.rideNote).toBe(esStrings.flowB.rideNote);
+    expect(plan.meetTips).toBe(esStrings.flowB.meetTips);
+    const invite = b.invite as { draft: string };
+    expect(invite.draft).toContain("acompañarme");
   });
 });
 
@@ -103,5 +134,122 @@ describe("Flow C (ad check)", () => {
     );
     expect(trace.map((s) => s.tool)).toEqual(["prescreen"]);
     expect(result).toMatchObject({ kind: "help" });
+  });
+
+  it("ends Spanish runs with the Spanish fixed wording and drafts", async () => {
+    const { result } = await runFlow(
+      "C",
+      { useExample: true, sharedText: EXAMPLE_AD_TEXT },
+      "es",
+    );
+    const c = result as FlowCResult;
+    expect(c.message).toContain(FIXED_SCAM_WORDING_ES);
+    const draft = c.draft as { draft: string };
+    expect(draft.draft).toContain("segunda opinión");
+  });
+
+  it("keeps the fixed wording (not the generic reply) when the guard fails", () => {
+    const cues = [
+      { cue: "urgency", evidence: '"Only 3 left in stock" (quoted ad text)' },
+    ];
+    const message = resolveFlowCMessage({
+      modelText: "This product works, guaranteed!",
+      cues,
+      lang: "en",
+      guardPass: false,
+    });
+    expect(message).toContain(FIXED_SCAM_WORDING_EN);
+    expect(message).not.toContain("Get help button");
+  });
+
+  it("keeps the no-cues suffix when the guard fails with no cues", () => {
+    const message = resolveFlowCMessage({
+      modelText: "This product works, guaranteed!",
+      cues: [],
+      lang: "en",
+      guardPass: false,
+    });
+    expect(message).toContain(NO_CUES_SUFFIX_EN);
+  });
+});
+
+describe("Flow A confirmed-only tools", () => {
+  function ctxFor(state: ReturnType<typeof createConfirmState>): Ctx {
+    return {
+      docFields: [],
+      confirm: state,
+      event: null,
+      adText: "",
+      advertiser: "unknown",
+      questions: [],
+    };
+  }
+
+  it("build_visit_list receives only confirmed values", () => {
+    const pending = createConfirmState([
+      { id: "date-0", field: "date", value: "Tuesday", readable: true },
+      { id: "time-0", field: "time", value: "10:30 AM", readable: true },
+    ]);
+    // Nothing confirmed: the tool gets an empty map, not the model output.
+    expect(
+      fillArgs(
+        "build_visit_list",
+        { fields: { date: "Tuesday", time: "10:30 AM", place: "Sneaky" } },
+        {},
+        ctxFor(pending),
+      ),
+    ).toEqual({ fields: {} });
+    const partial = confirmItem(pending, "date-0");
+    expect(
+      fillArgs("build_visit_list", { fields: { date: "x", place: "y" } }, {}, ctxFor(partial)),
+    ).toEqual({ fields: { date: "Tuesday" } });
+  });
+
+  it("set_reminder derives when from confirmed values only", () => {
+    const state = confirmItem(
+      confirmItem(
+        createConfirmState([
+          { id: "date-0", field: "date", value: "Tuesday", readable: true },
+          { id: "time-0", field: "time", value: "10:30 AM", readable: true },
+        ]),
+        "date-0",
+      ),
+      "time-0",
+    );
+    const filled = fillArgs(
+      "set_reminder",
+      { title: "Visit", when: "someday" },
+      {},
+      ctxFor(state),
+    ) as { title: string; when: string };
+    expect(filled.when).toContain("Tuesday");
+    expect(filled.when).toContain("10:30 AM");
+  });
+
+  it("add_question stores the person's words verbatim", async () => {
+    const words = "Will my bus pass work on Sunday??";
+    const out = (await executeTool("add_question", { question: words }, "en")) as {
+      stored: string;
+    };
+    expect(out.stored).toBe(words);
+  });
+
+  it("explain_ad steps come from i18n in both languages", async () => {
+    const english = (await executeTool("explain_ad", { advertiser: "Acme" }, "en")) as {
+      steps: string[];
+      adLibraryUrl: string;
+      note: string;
+    };
+    expect(english.steps).toEqual([
+      enStrings.flowC.whyStep1,
+      enStrings.flowC.whyStep2.replace("{url}", ACCOUNTS_CENTER_AD_PREFS_URL),
+      enStrings.flowC.reportHint,
+      enStrings.flowC.whyStep4.replace("{url}", english.adLibraryUrl),
+    ]);
+    expect(english.note).toBe(enStrings.flowC.regionalNote);
+    const spanish = (await executeTool("explain_ad", { advertiser: "Acme" }, "es")) as {
+      steps: string[];
+    };
+    expect(spanish.steps[0]).toBe(esStrings.flowC.whyStep1);
   });
 });

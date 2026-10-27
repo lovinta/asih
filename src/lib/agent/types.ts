@@ -4,10 +4,11 @@ export type FlowName = "A" | "B" | "C";
 export type Lang = "en" | "es";
 
 export type HistoryItem =
+  | { type: "message"; role: "user"; content: string }
   | {
       type: "message";
-      role: "user" | "assistant";
-      content: string;
+      role: "assistant";
+      content: { type: "output_text"; text: string }[];
       phase?: "commentary";
     }
   | { type: "reasoning"; encrypted_content: string; summary: [] }

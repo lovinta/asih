@@ -33,8 +33,17 @@ const BLOCKED: { pattern: RegExp; reason: string }[] = [
   { pattern: /\bdeber[ií]a tomar\b/i, reason: "treatment" },
 ];
 
+// Quoted spans are ad text quoted as evidence, not the agent's own words, so
+// they are stripped before the rules run. The fixed scam wording itself and
+// quoted cue evidence shown as quotes always pass; only the agent's own
+// claims and verdicts can fail.
+function stripQuotedSpans(text: string): string {
+  return text.replace(/"[^"]*"/g, " ").replace(/'[^']*'/g, " ");
+}
+
 export function ruleGuard(text: string): GuardResult {
-  const reasons = BLOCKED.filter((b) => b.pattern.test(text)).map(
+  const ownWords = stripQuotedSpans(text);
+  const reasons = BLOCKED.filter((b) => b.pattern.test(ownWords)).map(
     (b) => b.reason,
   );
   return { pass: reasons.length === 0, reasons: [...new Set(reasons)] };

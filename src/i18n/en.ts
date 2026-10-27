@@ -65,6 +65,10 @@ export const en = {
     openWhatsapp: "Open in WhatsApp",
     shareButton: "Share",
     rideNote: "You arrange the ride. This app never books rides.",
+    sharedSource: "Listing shared by the person",
+    calendarTypes: ["Public library", "Senior center", "Parks department"],
+    inviteTemplate:
+      "Hello{names}! Would you like to join me at {event} on {date} at {time}? We meet at {place}. Let me know!",
     meetTipsTitle: "Meeting new people",
     meetTips: "Meet in a public place. Tell a person you trust. You can leave at any time.",
     whatsappGroupNote:
@@ -78,6 +82,14 @@ export const en = {
     whyAdTitle: "Why am I seeing this ad?",
     draftTitle: "Ask someone you trust",
     draftDefault: "Can you look at this ad with me?",
+    unknownAdvertiser: "this advertiser",
+    draftTemplate:
+      "Can you look at this ad with me? It is from {advertiser}. I want a second opinion before I pay or share any details.",
+    whyStep1:
+      "Tap the three dots on the ad, then tap 'Why am I seeing this ad?' to see what the advertiser targeted.",
+    whyStep2: "Check your ad preferences in Accounts Center: {url}",
+    whyStep4: "Look the advertiser up in the Meta Ad Library: {url}",
+    regionalNote: "Regional ad choices vary.",
     openWhatsapp: "Open in WhatsApp",
     shareButton: "Share",
     reportHint:

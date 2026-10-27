@@ -20,6 +20,16 @@ describe("output guard rules", () => {
     expect(ruleGuard(FIXED_SCAM_WORDING_EN).pass).toBe(true);
   });
 
+  it("does not block quoted cue evidence (ad text), only the agent's own words", () => {
+    expect(
+      ruleGuard(
+        `${FIXED_SCAM_WORDING_EN} Evidence: "this product cures arthritis pain, guaranteed" and "this is safe, act now".`,
+      ).pass,
+    ).toBe(true);
+    // Unquoted claims from the agent itself still fail.
+    expect(ruleGuard("I checked: this product works for joint pain.").pass).toBe(false);
+  });
+
   it("fails closed to the fixed safe reply when the live check fails", async () => {
     const res = await outputGuard("A normal event summary.", {
       liveCheck: async () => ({ pass: false }),

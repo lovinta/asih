@@ -69,6 +69,10 @@ export const es: Strings = {
     openWhatsapp: "Abrir en WhatsApp",
     shareButton: "Compartir",
     rideNote: "Usted organiza el transporte. Esta aplicación nunca reserva viajes.",
+    sharedSource: "Anuncio compartido por la persona",
+    calendarTypes: ["Biblioteca pública", "Centro de personas mayores", "Departamento de parques"],
+    inviteTemplate:
+      "¡Hola{names}! ¿Le gustaría acompañarme a {event} el {date} a las {time}? Nos reunimos en {place}. ¡Avíseme!",
     meetTipsTitle: "Conocer gente nueva",
     meetTips: "Reúnase en un lugar público. Avise a una persona de confianza. Puede irse en cualquier momento.",
     whatsappGroupNote:
@@ -82,6 +86,14 @@ export const es: Strings = {
     whyAdTitle: "¿Por qué veo este anuncio?",
     draftTitle: "Pregunte a alguien de confianza",
     draftDefault: "¿Puedes mirar este anuncio conmigo?",
+    unknownAdvertiser: "este anunciante",
+    draftTemplate:
+      "¿Puede mirar este anuncio conmigo? Es de {advertiser}. Quiero una segunda opinión antes de pagar o compartir datos.",
+    whyStep1:
+      "Toque los tres puntos del anuncio y luego toque «Por qué veo este anuncio» para ver lo que el anunciante eligió.",
+    whyStep2: "Revise sus preferencias de anuncios en el Centro de cuentas: {url}",
+    whyStep4: "Busque al anunciante en la Biblioteca de anuncios de Meta: {url}",
+    regionalNote: "Las opciones de anuncios regionales varían.",
     openWhatsapp: "Abrir en WhatsApp",
     shareButton: "Compartir",
     reportHint:
