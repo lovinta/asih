@@ -78,3 +78,7 @@ Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Wear OS watch app
+
+A native Wear OS companion app is in [`wear/`](wear/README.md). See its README for build and emulator setup.
