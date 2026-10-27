@@ -1,0 +1,103 @@
+// All English UI strings for the three flows. src/i18n/es.ts must keep
+// identical keys (checked by src/i18n/parity.test.ts).
+export const en = {
+  appTitle: "Community Helper",
+  offlineBanner: "Offline demo mode: example data, no AI calls.",
+  exampleLabel: "EXAMPLE (synthetic data)",
+  languageToggle: "EN | ES",
+  readAloud: "Read aloud",
+  repeat: "Repeat",
+  pause: "Pause",
+  speechRate: "Speech rate",
+  back: "Back",
+  loading: "Working on it.",
+  getHelpButton: "Get help — not medical advice",
+  deleteEverything: "Delete everything",
+  dataNotice: {
+    title: "Before you share",
+    body: "Your saved items stay on this phone. To read a photo or voice note, it is sent to Meta's AI service. Meta says it does not use it to train its AI. This app tells Meta not to store its answers. Meta may still keep what is sent as needed to run the service, follow the law, and check for misuse and safety; it does not say for how many days. Delete everything removes what is saved on this phone. It cannot remove what Meta may have kept.",
+    acknowledge: "I understand",
+  },
+  getHelp: {
+    title: "Get help — not medical advice",
+    subtitle: "This app never calls anyone by itself. Tap a number to call.",
+    call911: "Call 911 (US emergency)",
+    indonesia112: "Call 112 (Indonesia, coverage varies by city)",
+    indonesia119: "Call 119 (Indonesia, medical emergencies)",
+    neverCalls: "The app never calls by itself.",
+  },
+  confirm: {
+    title: "Please confirm, one at a time",
+    confirmButton: "Confirm",
+    changeButton: "Change",
+    editLabel: "Correct value",
+    confirmed: "Confirmed",
+    waiting: "Waiting for you to confirm",
+    allDone: "All items are confirmed.",
+  },
+  flowA: {
+    title: "Appointment help",
+    uploadPhoto: "Take a photo of your letter",
+    useExample: "Use example letter",
+    unreadableNote: "I can't read this part",
+    questionsTitle: "Your questions for the visit",
+    questionsHint:
+      "Write your own questions. They are saved exactly as you write them.",
+    addQuestion: "Add question",
+    downloadIcs: "Download calendar file (.ics)",
+    saveVisit: "Save visit",
+    transportTitle: "Getting there",
+  },
+  flowB: {
+    title: "Find a group and plan to show up",
+    interestLabel: "What do you enjoy?",
+    interestHint:
+      "For example: walking, gardening. You can also paste listing text.",
+    placeLabel: "ZIP code or city (optional)",
+    placeHint: "Never enter your home address.",
+    findButton: "Find activities",
+    planTitle: "Plan for showing up",
+    checklistTitle: "Checklist",
+    inviteTitle: "Invite a small group",
+    inviteHint:
+      "You choose who to invite. The app never sends messages by itself.",
+    namesLabel: "Names (typed by you)",
+    openWhatsapp: "Open in WhatsApp",
+    shareButton: "Share",
+    rideNote: "You arrange the ride. This app never books rides.",
+    meetTipsTitle: "Meeting new people",
+    meetTips: "Meet in a public place. Tell a person you trust. You can leave at any time.",
+    whatsappGroupNote:
+      "To make a WhatsApp group: open WhatsApp, tap New group, add the people you choose, and send your invitation.",
+  },
+  flowC: {
+    title: "Health-scam and ad check",
+    shareAdHint: "Share an ad screenshot or paste the ad text.",
+    useExampleAd: "Use example ad",
+    cuesTitle: "Warning signs I can see",
+    whyAdTitle: "Why am I seeing this ad?",
+    draftTitle: "Ask someone you trust",
+    draftDefault: "Can you look at this ad with me?",
+    openWhatsapp: "Open in WhatsApp",
+    shareButton: "Share",
+    reportHint:
+      "To report an ad: tap the three dots on the ad, then tap Report ad.",
+  },
+  safety: {
+    scamWithCues:
+      "I can see these warning signs. I can't tell whether this is real or whether the product works. Check with someone you trust before paying or sharing details.",
+    noCuesSuffix: "That doesn't mean it's safe.",
+    fixedSafeReply:
+      "I can't help with that. If you need help right now, use the Get help button. You can also talk to someone you trust.",
+    whatsappCue:
+      "Moving to WhatsApp counts as a warning sign when it is asked before you can check who they are.",
+  },
+  voice: {
+    title: "Voice note",
+    uploadVoice: "Upload a voice note (WAV)",
+    transcriptTitle: "What you said",
+    replyDraftTitle: "Your reply draft",
+    openWhatsapp: "Open in WhatsApp",
+    shareButton: "Share",
+  },
+};
