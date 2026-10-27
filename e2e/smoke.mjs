@@ -113,8 +113,17 @@ try {
   const adLinks = await page.locator("a").evaluateAll((anchors) => anchors.map((a) => a.href));
   assert.ok(adLinks.some((url) => url.includes("facebook.com/ads/library/")), "Ad Library link missing");
   await screenshot(page, "04-flow-c-en.png");
+  // Choose Spanish BEFORE running the flow: agent-written text is produced in the language active at run time.
+  await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
   await page.getByRole("button", { name: "ES", exact: true }).click({ timeout });
+  await page.getByTestId("flow-c").click({ timeout });
+  await page.getByTestId("flow-c-example").click({ timeout });
+  await page.getByTestId("fixed-scam-wording").waitFor({ state: "visible", timeout });
   assert.ok((await page.getByTestId("fixed-scam-wording").innerText({ timeout })).includes("Puedo ver estas señales de advertencia."));
+  const esText = await page.locator("main").innerText({ timeout });
+  const drafts = await page.locator("textarea").evaluateAll((els) => els.map((el) => el.value).join("\n"));
+  assert.ok(drafts.includes("¿Puede mirar este anuncio conmigo?"), "Spanish draft missing");
+  assert.ok(!esText.includes("Tap the three dots"), "English ad steps shown in Spanish mode");
   await screenshot(page, "05-flow-c-es.png");
 
   await page.getByTestId("get-help").click({ timeout });

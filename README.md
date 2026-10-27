@@ -23,9 +23,9 @@ All offline example content is synthetic and labeled **EXAMPLE (synthetic data)*
 
 The live agent loop uses `muse-spark-1.3` through the Responses API for tool use, vision, and an output-guard check. `muse-wonder-1.0` gets one retry for unreadable images only. Voice transcription uses `muse-voice-transcribe-1.0` at `/v1/asr/transcribe`.
 
-Calls set `store: false` and request encrypted reasoning content. The app uses stateless encrypted reasoning replay: it resends its own input-item history, with no `previous_response_id` or conversation. These controls do not determine all service retention. Meta may still keep submitted content as needed to provide the service, comply with law, and detect abuse or safety issues under [Terms section 4.4](https://www.meta.ai/terms).
+Calls set `store: false` and request encrypted reasoning content. The app uses stateless encrypted reasoning replay: it resends its own input-item history, with no `previous_response_id` or conversation. These controls do not determine all service retention. Meta may still keep submitted content as needed to provide the service, comply with law, and detect abuse or safety issues under [Meta Model API Terms of Service, section 4.4](https://dev.meta.ai/legal/terms-of-service).
 
-The ad flow links to Meta's transparency tools: [Why am I seeing this ad?](https://www.facebook.com/help/), [Accounts Center ad preferences](https://www.facebook.com/help/943858526073065), and [Ad Library](https://www.facebook.com/ads/library/). Invitations use WhatsApp click-to-chat (`https://wa.me/?text=...`); the person chooses recipients and sends. This project was built with Muse Code.
+The ad flow links to Meta's transparency tools: the "Why am I seeing this ad?" menu on each ad (walk-through steps in the app), [Accounts Center ad preferences](https://www.facebook.com/help/943858526073065), and [Ad Library](https://www.facebook.com/ads/library/). Invitations use WhatsApp click-to-chat (`https://wa.me/?text=...`); the person chooses recipients and sends. This project was built with Muse Code.
 
 ## Setup
 
@@ -64,6 +64,10 @@ Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
 - Indonesian support is deferred.
 - An evaluation set is not built yet.
 - There is no deployment.
+- Choose the language before starting a flow: switching EN/ES while a result is on screen changes the app's own text, but text the agent already produced stays in the language it ran in.
+- Live mode (with `META_API_KEY`) has not been run against the real Meta Model API yet; only mock mode is tested end to end.
+- Not built yet from the plan: the evaluation set (about 70 cases), passcode, voice-note UI, private participation note, optional check-in and other stretch items.
+- Muse Image is not used yet (the plan names no feature for it).
 
 ## License
 
