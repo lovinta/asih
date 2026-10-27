@@ -2,6 +2,10 @@
 // notice gate share these. Every function is a no-op outside a browser.
 import type { Lang } from "./agent/types";
 
+// Asih speaks English a little slower than the browser default (persona rule).
+// TODO(Vinta): Spanish keeps the default 1.0 until you decide; the person can always change it with the slider.
+export const DEFAULT_SPEECH_RATE: Record<Lang, number> = { en: 0.9, es: 1 };
+
 export function speechVoiceLang(lang: Lang): string {
   return lang === "es" ? "es-US" : "en-US";
 }
@@ -20,7 +24,7 @@ function pickVoice(lang: Lang): SpeechSynthesisVoice | null {
 
 // Speak text aloud in the current UI language. Returns false when speech is
 // unavailable (server render, no voices); callers still show the text.
-export function readAloud(text: string, lang: Lang, rate = 1): boolean {
+export function readAloud(text: string, lang: Lang, rate = DEFAULT_SPEECH_RATE[lang]): boolean {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return false;
   try {
     window.speechSynthesis.cancel();

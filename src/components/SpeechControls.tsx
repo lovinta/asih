@@ -4,7 +4,7 @@
 // Pause/Resume, and a speech-rate slider. The text is always shown.
 import { useState } from "react";
 import type { Lang } from "@/lib/agent/types";
-import { readAloud } from "@/lib/speech";
+import { DEFAULT_SPEECH_RATE, readAloud } from "@/lib/speech";
 import { useLang } from "./Lang";
 
 function canSpeak(): boolean {
@@ -13,7 +13,7 @@ function canSpeak(): boolean {
 
 export default function SpeechControls({ text, lang }: { text: string; lang: Lang }) {
   const { t } = useLang();
-  const [rate, setRate] = useState(1);
+  const [rate, setRate] = useState(DEFAULT_SPEECH_RATE[lang]);
   const [paused, setPaused] = useState(false);
 
   const read = () => {
