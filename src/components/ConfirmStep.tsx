@@ -23,6 +23,10 @@ interface ConfirmStepProps {
   onDone: (state: ConfirmState) => void;
 }
 
+function labelField(field: string, labels: Record<string, string>): string {
+  return labels[field] ?? field;
+}
+
 export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: ConfirmStepProps) {
   const { t } = useLang();
   const [state, setState] = useState<ConfirmState>(initial);
@@ -37,10 +41,10 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
   useEffect(() => {
     if (!current) return;
     const spoken = current.readable
-      ? `${current.field}: ${current.value}`
-      : `${current.field}: ${unreadableNote}`;
+      ? `${labelField(current.field, t.fieldKinds)}: ${current.value}`
+      : `${labelField(current.field, t.fieldKinds)}: ${unreadableNote}`;
     readAloud(spoken, lang);
-  }, [current, lang, unreadableNote]);
+  }, [current, lang, unreadableNote, t.fieldKinds]);
 
   const confirmCurrent = () => {
     if (!current) return;
@@ -74,7 +78,7 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
         <ul className="confirm-list">
           {state.items.map((item) => (
             <li key={item.id}>
-              <strong>{item.field}:</strong> {item.value} — {t.confirm.confirmed}
+              <strong>{labelField(item.field, t.fieldKinds)}:</strong> {item.value} — {t.confirm.confirmed}
             </li>
           ))}
         </ul>
@@ -93,7 +97,7 @@ export default function ConfirmStep({ initial, lang, unreadableNote, onDone }: C
     <section aria-live="polite">
       <h2>{t.confirm.title}</h2>
       <p className="big-text">
-        <strong>{current.field}:</strong>{" "}
+        <strong>{labelField(current.field, t.fieldKinds)}:</strong>{" "}
         {current.readable ? current.value : unreadableNote}
       </p>
       {!current.readable && !fixedIds.includes(current.id) && (

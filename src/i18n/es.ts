@@ -5,6 +5,17 @@ import type { en } from "./en";
 type Strings = typeof en;
 
 export const es: Strings = {
+  fieldKinds: {
+    date: "Fecha", time: "Hora", place: "Lugar", clinic_name: "Clínica",
+    person_name: "Quién le atenderá", phone: "Teléfono", bring_items: "Qué llevar",
+  },
+  cueKinds: {
+    urgency: "Presión para actuar rápido", "too-good-claim": "Promesa que parece demasiado buena",
+    "celebrity-endorsement": "Respaldo de una persona famosa",
+    "move-to-private-chat": "Le pide pasar a un chat privado",
+    "payment-risk": "Solicita un pago arriesgado", "asks-personal-details": "Pide datos personales o bancarios",
+    "unusual-url": "Dirección web inusual",
+  },
   appTitle: "Ayudante para personas mayores (nombre provisional)",
   common: {
     close: "Cerrar",
@@ -139,8 +150,10 @@ export const es: Strings = {
       "¿Puede mirar este anuncio conmigo? Es de {advertiser}. Quiero una segunda opinión antes de pagar o compartir datos.",
     whyStep1:
       "Toque los tres puntos del anuncio y luego toque «Por qué veo este anuncio» para ver lo que el anunciante eligió.",
-    whyStep2: "Revise sus preferencias de anuncios en el Centro de cuentas: {url}",
-    whyStep4: "Busque al anunciante en la Biblioteca de anuncios de Meta: {url}",
+    whyStep2: "Revise sus preferencias de anuncios en el Centro de cuentas.",
+    whyStep4: "Busque al anunciante en la Biblioteca de anuncios de Meta.",
+    prefsLink: "Abrir las preferencias de anuncios en el Centro de cuentas",
+    adLibraryLink: "Buscar a {advertiser} en la Biblioteca de anuncios de Meta",
     regionalNote: "Las opciones de anuncios regionales varían.",
     openWhatsapp: "Abrir en WhatsApp",
     shareButton: "Compartir",

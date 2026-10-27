@@ -145,6 +145,7 @@ export default function FlowA({ lang, needGate, openHelp }: FlowProps) {
       start,
       end: new Date(start.getTime() + 60 * 60 * 1000),
       location: saved.place,
+      fieldLabels: t.fieldKinds,
     });
     downloadTextFile("visit.ics", ics, "text/calendar");
   };
@@ -152,7 +153,7 @@ export default function FlowA({ lang, needGate, openHelp }: FlowProps) {
   const saved = finalState ? saveConfirmed(finalState) : {};
   const visitStart = parseVisitDateTime(saved.date ?? "", saved.time ?? "");
   const summaryText = Object.entries(saved)
-    .map(([field, value]) => `${field}: ${value}`)
+    .map(([field, value]) => `${t.fieldKinds[field as keyof typeof t.fieldKinds] ?? field}: ${value}`)
     .join(". ");
 
   return (
@@ -206,7 +207,7 @@ export default function FlowA({ lang, needGate, openHelp }: FlowProps) {
           <ul className="confirm-list">
             {Object.entries(saved).map(([field, value]) => (
               <li key={field}>
-                <strong>{field}:</strong> {value}
+                <strong>{t.fieldKinds[field as keyof typeof t.fieldKinds] ?? field}:</strong> {value}
               </li>
             ))}
           </ul>

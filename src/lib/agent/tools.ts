@@ -209,6 +209,8 @@ const CUE_PATTERNS: { cue: string; pattern: RegExp }[] = [
   { cue: "unusual-url", pattern: /bit\.ly|tinyurl|\.xyz|\.top|linktr\.ee/i },
 ];
 
+export const SCAM_CUE_KINDS = CUE_PATTERNS.map(({ cue }) => cue);
+
 function quoteEvidence(text: string, match: RegExpMatchArray): string {
   const idx = match.index ?? 0;
   const lineStart = text.lastIndexOf("\n", idx - 1) + 1;
@@ -228,7 +230,7 @@ export function findScamCues(adText: string): ScamCue[] {
 
 // --- Live structured extraction (LIVE mode only) ----------------------------
 
-const LETTER_KINDS = [
+export const LETTER_KINDS = [
   "date",
   "time",
   "place",
@@ -236,7 +238,7 @@ const LETTER_KINDS = [
   "person_name",
   "phone",
   "bring_items",
-];
+] as const;
 
 const LETTER_FIELDS_SCHEMA = {
   type: "object",
@@ -338,7 +340,7 @@ function sanitizeLetterFields(raw: unknown, unreadableNote: string): LetterField
   if (!Array.isArray(list)) throw new Error("Vision did not return fields.");
   return list.map((entry) => {
     const record = entry as Record<string, unknown>;
-    const kind = LETTER_KINDS.includes(String(record.kind))
+    const kind = LETTER_KINDS.includes(String(record.kind) as (typeof LETTER_KINDS)[number])
       ? (String(record.kind) as LetterField["kind"])
       : "place";
     return {
@@ -622,10 +624,11 @@ export async function executeTool(
       return {
         steps: [
           t.flowC.whyStep1,
-          fillTemplate(t.flowC.whyStep2, { url: ACCOUNTS_CENTER_AD_PREFS_URL }),
+          t.flowC.whyStep2,
           t.flowC.reportHint,
-          fillTemplate(t.flowC.whyStep4, { url: adLibrarySearchUrl(advertiser) }),
+          t.flowC.whyStep4,
         ],
+        advertiser,
         adLibraryUrl: adLibrarySearchUrl(advertiser),
         prefsUrl: ACCOUNTS_CENTER_AD_PREFS_URL,
         note: t.flowC.regionalNote,

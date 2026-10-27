@@ -1,6 +1,17 @@
 // All English UI strings for the three flows. src/i18n/es.ts must keep
 // identical keys (checked by src/i18n/parity.test.ts).
 export const en = {
+  fieldKinds: {
+    date: "Date", time: "Time", place: "Place", clinic_name: "Clinic",
+    person_name: "Who you will see", phone: "Phone", bring_items: "What to bring",
+  },
+  cueKinds: {
+    urgency: "Hurry pressure", "too-good-claim": "Promise that sounds too good",
+    "celebrity-endorsement": "Famous person endorsement",
+    "move-to-private-chat": "Asks you to move to a private chat",
+    "payment-risk": "Requests risky payment", "asks-personal-details": "Asks for personal or bank details",
+    "unusual-url": "Unusual web address",
+  },
   appTitle: "Older adults' helper (working name)",
   common: {
     close: "Close",
@@ -135,8 +146,10 @@ export const en = {
       "Can you look at this ad with me? It is from {advertiser}. I want a second opinion before I pay or share any details.",
     whyStep1:
       "Tap the three dots on the ad, then tap 'Why am I seeing this ad?' to see what the advertiser targeted.",
-    whyStep2: "Check your ad preferences in Accounts Center: {url}",
-    whyStep4: "Look the advertiser up in the Meta Ad Library: {url}",
+    whyStep2: "Check your ad preferences in Accounts Center.",
+    whyStep4: "Look the advertiser up in the Meta Ad Library.",
+    prefsLink: "Open ad preferences in Accounts Center",
+    adLibraryLink: "Search the Meta Ad Library for {advertiser}",
     regionalNote: "Regional ad choices vary.",
     openWhatsapp: "Open in WhatsApp",
     shareButton: "Share",

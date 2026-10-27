@@ -70,7 +70,7 @@ export function saveConfirmed(state: ConfirmState): Record<string, string> {
 // cannot leak into a download through this path.
 export function exportConfirmedICS(
   state: ConfirmState,
-  opts: { title: string; start: Date; end?: Date; location?: string },
+  opts: { title: string; start: Date; end?: Date; location?: string; fieldLabels?: Record<string, string> },
 ): string {
   const pending = state.items.filter((item) => item.status !== "confirmed");
   if (pending.length > 0) {
@@ -81,7 +81,7 @@ export function exportConfirmedICS(
     );
   }
   const description = state.items
-    .map((item) => `${item.field}: ${item.value}`)
+    .map((item) => `${opts.fieldLabels?.[item.field] ?? item.field}: ${item.value}`)
     .join("\n");
   return buildICS({ ...opts, description });
 }

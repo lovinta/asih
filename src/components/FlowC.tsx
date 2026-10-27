@@ -21,6 +21,7 @@ interface Explanation {
   adLibraryUrl?: string;
   prefsUrl?: string;
   note?: string;
+  advertiser?: string;
 }
 
 interface Draft {
@@ -190,7 +191,7 @@ export default function FlowC({ lang, needGate, openHelp }: FlowProps) {
             <ul data-testid="scam-cues" className="confirm-list">
               {result.cues.map((cue, i) => (
                 <li key={`${cue.cue}-${i}`}>
-                  <strong>{cue.cue}:</strong> <q>{cue.evidence}</q>
+                  <strong>{t.cueKinds[cue.cue as keyof typeof t.cueKinds] ?? cue.cue}:</strong> <q>{cue.evidence}</q>
                 </li>
               ))}
             </ul>
@@ -206,23 +207,12 @@ export default function FlowC({ lang, needGate, openHelp }: FlowProps) {
           {explanation?.steps && (
             <ol className="steps-list">
               {explanation.steps.map((step, i) => (
-                <li key={i}>{step}</li>
+                <li key={i}>
+                  {step}{i === 1 && explanation.prefsUrl ? <> <a href={explanation.prefsUrl} target="_blank" rel="noopener noreferrer">{t.flowC.prefsLink}</a></> : null}
+                  {i === 3 && explanation.adLibraryUrl ? <> <a href={explanation.adLibraryUrl} target="_blank" rel="noopener noreferrer">{t.flowC.adLibraryLink.replace("{advertiser}", explanation.advertiser ?? t.flowC.unknownAdvertiser)}</a></> : null}
+                </li>
               ))}
             </ol>
-          )}
-          {explanation?.prefsUrl && (
-            <p>
-              <a href={explanation.prefsUrl} target="_blank" rel="noopener noreferrer">
-                {explanation.prefsUrl}
-              </a>
-            </p>
-          )}
-          {explanation?.adLibraryUrl && (
-            <p>
-              <a href={explanation.adLibraryUrl} target="_blank" rel="noopener noreferrer">
-                {explanation.adLibraryUrl}
-              </a>
-            </p>
           )}
           {explanation?.note && <p className="muted">{explanation.note}</p>}
 
