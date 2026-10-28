@@ -2,6 +2,7 @@
 // Server-only: transcription runs through the server-side client.
 import { transcribe } from "@/lib/meta/transcribe";
 import type { Lang } from "@/lib/agent/types";
+import { validateTranscribeWav } from "@/lib/wavValidation";
 
 export async function POST(request: Request) {
   let form: FormData;
@@ -18,6 +19,8 @@ export async function POST(request: Request) {
   }
   try {
     const buffer = Buffer.from(await audio.arrayBuffer());
+    const validationError = validateTranscribeWav(buffer);
+    if (validationError) return Response.json({ error: validationError }, { status: 400 });
     const { transcript, mock } = await transcribe(buffer, lang);
     return Response.json({ transcript, mock });
   } catch (err) {

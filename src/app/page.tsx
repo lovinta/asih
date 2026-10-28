@@ -13,20 +13,10 @@ import GetHelp from "@/components/GetHelp";
 import MockBanner from "@/components/MockBanner";
 import SpeechControls from "@/components/SpeechControls";
 import DataNoticeDialog, { isNoticeAccepted } from "@/components/DataNotice";
+import VoiceNote from "@/components/VoiceNote";
 import { LangProvider, useLang } from "@/components/Lang";
 
-type Screen = "home" | "help" | "A" | "B" | "C";
-
-const OWNED_PREFIX = "oah.";
-
-function clearAppStorage(): void {
-  const owned: string[] = [];
-  for (let i = 0; i < window.localStorage.length; i++) {
-    const key = window.localStorage.key(i);
-    if (key && key.startsWith(OWNED_PREFIX)) owned.push(key);
-  }
-  for (const key of owned) window.localStorage.removeItem(key);
-}
+type Screen = "home" | "help" | "A" | "B" | "C" | "voice";
 
 function App() {
   const { lang, t, setLang } = useLang();
@@ -55,7 +45,12 @@ function App() {
 
   const deleteEverything = useCallback(() => {
     if (!window.confirm(t.home.deleteConfirm)) return;
-    clearAppStorage();
+    const owned: string[] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (key?.startsWith("oah.")) owned.push(key);
+    }
+    for (const key of owned) window.localStorage.removeItem(key);
     // Keep the current language active after clearing.
     setLang(lang);
     setScreen("home");
@@ -112,6 +107,9 @@ function App() {
               >
                 {t.home.appointmentLetter}
               </button>
+              <button type="button" data-testid="voice-note" className="primary big-button" onClick={() => setScreen("voice")}>
+                {t.home.voiceNote}
+              </button>
               <button
                 type="button"
                 data-testid="flow-b"
@@ -142,9 +140,11 @@ function App() {
 
         {screen === "help" && <GetHelp onBack={() => setScreen("home")} />}
 
+        {screen === "voice" && <div><button type="button" data-testid="screen-back" onClick={() => setScreen("home")}>{t.back}</button><VoiceNote lang={lang} needGate={needGate} openHelp={openHelp} openAdCheck={() => setScreen("C")} openAppointment={() => setScreen("A")} openGroups={() => setScreen("B")} /></div>}
+
         {(screen === "A" || screen === "B" || screen === "C") && (
           <div>
-            <button type="button" onClick={() => setScreen("home")}>
+            <button type="button" data-testid="screen-back" onClick={() => setScreen("home")}>
               {t.back}
             </button>
             {screen === "A" && (

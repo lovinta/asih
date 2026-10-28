@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { chromium } from "playwright-core";
 
-const baseUrl = "http://127.0.0.1:3124";
+const port = Number(process.env.E2E_PORT || 3124);
+const baseUrl = `http://127.0.0.1:${port}`;
 const screenshotDir = fileURLToPath(new URL("./screenshots/", import.meta.url));
 const timeout = 10_000;
 let server;
@@ -29,7 +30,7 @@ async function screenshot(page, name) {
 
 try {
   await mkdir(screenshotDir, { recursive: true });
-  server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", "3124"], {
+  server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(port)], {
     cwd: process.cwd(),
     env: { ...process.env, MOCK_MODE: "1", META_API_KEY: "" },
     stdio: "inherit",
@@ -39,13 +40,23 @@ try {
   browser = await chromium.launch({
     executablePath: "/usr/bin/google-chrome",
     headless: true,
-    args: ["--no-sandbox"],
+    args: ["--no-sandbox", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
   });
   const context = await browser.newContext({ viewport: { width: 430, height: 900 } });
+  await context.grantPermissions(["microphone"], { origin: baseUrl });
   await context.addInitScript(() => {
     window.open = (url) => {
       window.__lastOpenedUrl = String(url);
       return null;
+    };
+    const media = navigator.mediaDevices;
+    if (media) media.getUserMedia = async () => {
+      const audio = new AudioContext();
+      const destination = audio.createMediaStreamDestination();
+      const tone = audio.createOscillator();
+      tone.connect(destination); tone.start();
+      await audio.resume();
+      return destination.stream;
     };
   });
   const page = await context.newPage();
@@ -86,7 +97,7 @@ try {
   await page.getByRole("button", { name: "Download calendar file (.ics)" }).waitFor({ state: "visible", timeout });
   await screenshot(page, "02-flow-a-confirmed.png");
 
-  await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
+  await page.getByTestId("screen-back").click({ timeout });
   await page.getByTestId("flow-b").click({ timeout });
   await page.getByRole("button", { name: "Use example listing" }).click({ timeout });
   await page.getByTestId("confirm-item").waitFor({ state: "visible", timeout });
@@ -127,6 +138,39 @@ try {
   assert.ok(drafts.includes("¿Puede mirar este anuncio conmigo?"), "Spanish draft missing");
   assert.ok(!esText.includes("Tap the three dots"), "English ad steps shown in Spanish mode");
   await screenshot(page, "05-flow-c-es.png");
+
+  await page.getByTestId("screen-back").click({ timeout });
+  await page.getByRole("button", { name: "EN", exact: true }).click({ timeout });
+  await page.getByTestId("voice-note").click({ timeout });
+  await page.getByRole("button", { name: "Use example voice note" }).click({ timeout });
+  await page.getByTestId("voice-transcript").waitFor({ state: "visible", timeout });
+  await screenshot(page, "07-voice-note-transcript.png");
+  await page.getByRole("button", { name: "Write a reply" }).click({ timeout });
+  const voiceDraft = "I will call you later.";
+  await page.getByTestId("voice-draft").fill(voiceDraft, { timeout });
+  await page.getByRole("button", { name: "Open in WhatsApp" }).last().click({ timeout });
+  const voiceUrl = await page.evaluate(() => window.__lastOpenedUrl);
+  assert.ok(voiceUrl.includes(encodeURIComponent(voiceDraft)), "WhatsApp URL does not contain the voice reply draft");
+  await screenshot(page, "08-voice-note-reply.png");
+  await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
+  await page.getByTestId("voice-note").click({ timeout });
+  const sampleRate = 16000;
+  const wav = Buffer.alloc(46);
+  wav.write("RIFF", 0); wav.writeUInt32LE(38, 4); wav.write("WAVE", 8); wav.write("fmt ", 12); wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22); wav.writeUInt32LE(sampleRate, 24); wav.writeUInt32LE(sampleRate * 2, 28);
+  wav.writeUInt16LE(2, 32); wav.writeUInt16LE(16, 34); wav.write("data", 36); wav.writeUInt32LE(2, 40);
+  await page.locator("#voice-upload").setInputFiles({ name: "small.wav", mimeType: "audio/wav", buffer: wav });
+  await page.getByTestId("voice-transcript").waitFor({ state: "visible", timeout });
+  await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
+  await page.getByTestId("voice-note").click({ timeout });
+  await page.getByRole("button", { name: "Start recording" }).click({ timeout });
+  await page.waitForTimeout(100);
+  if (await page.getByTestId("data-notice").count()) await page.getByTestId("acknowledge-notice").click({ timeout });
+  if (await page.getByRole("button", { name: "Start recording" }).count()) await page.getByRole("button", { name: "Start recording" }).click({ timeout });
+  await delay(1500);
+  await page.getByRole("button", { name: "Stop recording" }).click({ timeout });
+  await page.getByTestId("voice-transcript").waitFor({ state: "visible", timeout });
+  await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
 
   await page.getByTestId("get-help").click({ timeout });
   await page.getByTestId("call-911").waitFor({ state: "visible", timeout });

@@ -11,6 +11,7 @@ The abstract avatar is a placeholder. TODO: replace it with the final avatar gen
 - **Appointment help:** read an example letter, confirm each extracted item, then save the visit or download a calendar file.
 - **Find a group:** review an example community event, confirm when and where it meets, plan transportation, and edit an invitation.
 - **Check an ad:** review quoted warning cues, learn how to inspect ad settings and find the advertiser in Meta's Ad Library, then choose whether to share a note.
+- **Voice note:** record or upload audio, read the transcript, then edit a reply before opening WhatsApp or asking Asih about it.
 
 All offline example content is synthetic and labeled **EXAMPLE (synthetic data)**.
 
@@ -31,6 +32,10 @@ The live agent loop uses `muse-spark-1.3` through the Responses API for tool use
 
 Calls set `store: false` and request encrypted reasoning content. The app uses stateless encrypted reasoning replay: it resends its own input-item history, with no `previous_response_id` or conversation. These controls do not determine all service retention. Meta may still keep submitted content as needed to provide the service, comply with law, and detect abuse or safety issues under [Meta Model API Terms of Service, section 4.4](https://dev.meta.ai/legal/terms-of-service).
 
+## Voice notes
+
+The browser converts uploaded or recorded audio to mono 16-bit PCM WAV at 16 kHz and posts it to this app's `/api/transcribe` endpoint. In live mode, the server sends Meta Voice Transcribe a multipart request with a JSON `request` part (`model`, `mode`, `audioEncoding`, and `languageBias`) and an `audio` part containing the WAV. `store: false` is not used by this endpoint; the transcribe client does not send that field. The data notice applies before recording or upload. The transcript is shown before any other action.
+
 The ad flow links to Meta's transparency tools: the "Why am I seeing this ad?" menu on each ad (walk-through steps in the app), [Accounts Center ad preferences](https://www.facebook.com/help/943858526073065), and [Ad Library](https://www.facebook.com/ads/library/). Invitations use WhatsApp click-to-chat (`https://wa.me/?text=...`); the person chooses recipients and sends. This project was built with Muse Code.
 
 ## Setup
@@ -47,7 +52,7 @@ Run checks and the browser smoke test:
 
 ```sh
 npm test
-npm run build && npm run e2e
+npm run build && E2E_PORT=3125 npm run e2e
 ```
 
 The browser test expects a production build to exist and system Chrome at `/usr/bin/google-chrome`. The smoke test runs against the deterministic mock mode and saves screenshots in `e2e/screenshots/`.
@@ -64,15 +69,14 @@ Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
 
 ## Known limits and TODOs
 
-- Spanish needs a fluent-speaker check.
 - Confirm the transit link provider (Google Maps) with Vinta.
-- Voice-note flow and private participation note are not built in the UI yet.
+- Spanish needs a fluent-speaker check, including the new voice-note strings.
 - Indonesian support is deferred.
 - An evaluation set is not built yet.
 - There is no deployment.
 - Choose the language before starting a flow: switching EN/ES while a result is on screen changes the app's own text, but text the agent already produced stays in the language it ran in.
 - Live mode (with `META_API_KEY`) has not been run against the real Meta Model API yet; only mock mode is tested end to end.
-- Not built yet from the plan: the evaluation set (about 70 cases), passcode, voice-note UI, private participation note, optional check-in and other stretch items.
+- Not built yet from the plan: the evaluation set (about 70 cases), passcode, optional check-in and other stretch items.
 - Muse Image is not used yet (the plan names no feature for it).
 
 ## License
