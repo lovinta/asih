@@ -19,6 +19,8 @@ object ServerUrlPolicy {
         val host = uri.host?.lowercase(Locale.ROOT)
         if (host.isNullOrBlank()) return Result.Rejected(Error.INVALID_URL)
         if (uri.rawUserInfo != null) return Result.Rejected(Error.USER_INFO_NOT_ALLOWED)
+        // The app appends /api/... to this base URL, so a query or fragment would break every request.
+        if (uri.rawQuery != null || uri.rawFragment != null) return Result.Rejected(Error.INVALID_URL)
         if (scheme == "https") return Result.Accepted(trimmed.trimEnd('/'))
         if (scheme == "http" && host in DEV_HOSTS) return Result.Accepted(trimmed.trimEnd('/'))
         return Result.Rejected(Error.HTTPS_REQUIRED)

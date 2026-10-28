@@ -15,6 +15,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.runtime.*
@@ -131,12 +133,15 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                         else Text(noticeItems[i], color = Color.White, fontSize = if (i == 2) 17.sp else 19.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 8.dp))
                     }
                 }
-                Screen.HOME -> Column(Modifier.fillMaxSize().background(Color.Black).padding(start = roundInset + 10.dp, end = roundInset + 10.dp, top = if (round) 34.dp else 10.dp, bottom = 10.dp).semantics { }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
-                    Text("Asih", color = Color.White, fontSize = 24.sp, modifier = Modifier.onGloballyPositioned { testTitleBounds = it.boundsInRoot() })
-                    Text(getString(R.string.intro), color = Color.White, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.onGloballyPositioned { testIntroBounds = it.boundsInRoot() })
+                // Home: sized so title, intro and the talk button fit a small round screen without scaling;
+                // it scrolls (no scaling) so the Server chip below the talk button stays reachable.
+                Screen.HOME -> Column(Modifier.fillMaxSize().background(Color.Black).verticalScroll(rememberScrollState()).padding(start = roundInset, end = roundInset, top = if (round) 32.dp else 8.dp, bottom = 40.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Asih", color = Color.White, fontSize = 22.sp, modifier = Modifier.onGloballyPositioned { testTitleBounds = it.boundsInRoot() })
+                    Text(getString(R.string.intro), color = Color.White, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 4.dp).onGloballyPositioned { testIntroBounds = it.boundsInRoot() })
                     testTalkButtonLabel = getString(if (isRecording) R.string.tap_stop else R.string.tap_talk)
-                    Button(onClick = talkAction, modifier = Modifier.size(112.dp).semantics { contentDescription = getString(if (isRecording) R.string.tap_stop else R.string.tap_talk) }) { Text(if (isRecording) getString(R.string.tap_stop) else getString(R.string.tap_talk), textAlign = TextAlign.Center, fontSize = 17.sp) }
+                    Button(onClick = talkAction, modifier = Modifier.size(92.dp).semantics { contentDescription = getString(if (isRecording) R.string.tap_stop else R.string.tap_talk) }) { Text(if (isRecording) getString(R.string.tap_stop) else getString(R.string.tap_talk), textAlign = TextAlign.Center, fontSize = 17.sp) }
                     if (statusText.isNotBlank()) Text(statusText, color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(8.dp))
                     Button(onClick = { draftUrl = serverUrl; screen = Screen.SETTINGS }) { Text(getString(R.string.server), fontSize = 14.sp) }
                 }
                 Screen.SETTINGS -> ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black).padding(horizontal = roundInset), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(top = if (round) 48.dp else 12.dp, bottom = 24.dp), autoCentering = androidx.wear.compose.foundation.lazy.AutoCenteringParams(itemIndex = 0)) {

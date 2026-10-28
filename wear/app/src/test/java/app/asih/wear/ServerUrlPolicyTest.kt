@@ -24,4 +24,10 @@ class ServerUrlPolicyTest {
         assertEquals(ServerUrlPolicy.Result.Rejected(ServerUrlPolicy.Error.REQUIRED), ServerUrlPolicy.validate("  "))
         assertEquals(ServerUrlPolicy.Result.Rejected(ServerUrlPolicy.Error.USER_INFO_NOT_ALLOWED), ServerUrlPolicy.validate("https://user@example.org"))
     }
+
+    @Test fun rejectsQueryAndFragmentBecauseApiPathsAreAppended() {
+        listOf("https://example.org/?a=1", "https://example.org/#x").forEach { value ->
+            assertEquals(ServerUrlPolicy.Result.Rejected(ServerUrlPolicy.Error.INVALID_URL), ServerUrlPolicy.validate(value))
+        }
+    }
 }
