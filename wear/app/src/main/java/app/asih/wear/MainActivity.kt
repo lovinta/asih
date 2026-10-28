@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         testNavigateScreen = { screen = Screen.valueOf(it) }
         testCurrentScreen = screen.name
         var statusText by remember { mutableStateOf("") }
+        var serverUrlError by remember { mutableStateOf("") }
         var transcript by remember { mutableStateOf("") }
         var reply by remember { mutableStateOf<Reply?>(null) }
         var serverUrl by remember { mutableStateOf(prefs.getString("server_url", BuildConfig.SERVER_URL) ?: BuildConfig.SERVER_URL) }
@@ -141,7 +142,13 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                 Screen.SETTINGS -> ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black).padding(horizontal = roundInset), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(top = if (round) 48.dp else 12.dp, bottom = 24.dp), autoCentering = androidx.wear.compose.foundation.lazy.AutoCenteringParams(itemIndex = 0)) {
                     item { Text(getString(R.string.server_url), color = Color.White, fontSize = 16.sp) }
                     item { androidx.compose.foundation.text.BasicTextField(value = draftUrl, onValueChange = { draftUrl = it }, textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 17.sp), modifier = Modifier.fillMaxWidth().background(Color.DarkGray).padding(8.dp)) }
-                    item { Button(onClick = { serverUrl = draftUrl.trim().trimEnd('/'); prefs.edit().putString("server_url", serverUrl).apply(); screen = Screen.HOME }) { Text(getString(R.string.save)) } }
+                    if (serverUrlError.isNotBlank()) item { Text(serverUrlError, color = Color.White, fontSize = 18.sp, textAlign = TextAlign.Center) }
+                    item { Button(onClick = {
+                        when (val validation = ServerUrlPolicy.validate(draftUrl)) {
+                            is ServerUrlPolicy.Result.Accepted -> { serverUrl = validation.normalizedUrl; prefs.edit().putString("server_url", serverUrl).apply(); serverUrlError = ""; screen = Screen.HOME }
+                            is ServerUrlPolicy.Result.Rejected -> serverUrlError = serverUrlErrorMessage(validation.error)
+                        }
+                    }) { Text(getString(R.string.save)) } }
                     item { Button(onClick = { screen = Screen.HOME }) { Text(getString(R.string.back)) } }
                 }
                 Screen.REPLY -> {
@@ -187,6 +194,10 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun stopAndSend(url: String, lang: String, onStatus: (String) -> Unit, onResult: (String, Reply) -> Unit) {
+        val normalizedUrl = when (val validation = ServerUrlPolicy.validate(url)) {
+            is ServerUrlPolicy.Result.Accepted -> validation.normalizedUrl
+            is ServerUrlPolicy.Result.Rejected -> { onStatus(serverUrlErrorMessage(validation.error)); return }
+        }
         recording = false
         val rec = recorder; recorder = null
         try { rec?.stop() } catch (_: Exception) { }
@@ -199,12 +210,12 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                 val transcribeBody = MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("audio", "voice.wav", wav.toRequestBody("audio/wav".toMediaType()))
                     .addFormDataPart("lang", lang).build()
-                val transcribeResponse = http.newCall(Request.Builder().url("$url/api/transcribe").post(transcribeBody).build()).execute()
+                val transcribeResponse = http.newCall(Request.Builder().url("$normalizedUrl/api/transcribe").post(transcribeBody).build()).execute()
                 val transcriptJson = transcribeResponse.body?.string().orEmpty()
                 if (!transcribeResponse.isSuccessful) throw IllegalStateException("HTTP ${transcribeResponse.code}: ${errorMessage(transcriptJson)}")
                 val text = JSONObject(transcriptJson).optString("transcript")
                 val payload = JSONObject().put("flow", "auto").put("lang", lang).put("input", JSONObject().put("text", text)).toString()
-                val agentResponse = http.newCall(Request.Builder().url("$url/api/agent").post(payload.toRequestBody("application/json".toMediaType())).build()).execute()
+                val agentResponse = http.newCall(Request.Builder().url("$normalizedUrl/api/agent").post(payload.toRequestBody("application/json".toMediaType())).build()).execute()
                 val agentJson = agentResponse.body?.string().orEmpty()
                 if (!agentResponse.isSuccessful) throw IllegalStateException("HTTP ${agentResponse.code}: ${errorMessage(agentJson)}")
                 runOnUiThread { onResult(text, formatReply(agentJson, lang == "es", getString(R.string.unexpected_response), getString(R.string.invalid_server_response), mapOf(
@@ -218,6 +229,13 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun errorMessage(raw: String): String = try { JSONObject(raw).optString("error", raw).take(100) } catch (_: Exception) { raw.take(100) }
+
+    private fun serverUrlErrorMessage(error: ServerUrlPolicy.Error): String = getString(when (error) {
+        ServerUrlPolicy.Error.REQUIRED -> R.string.server_url_required
+        ServerUrlPolicy.Error.INVALID_URL -> R.string.server_url_invalid
+        ServerUrlPolicy.Error.HTTPS_REQUIRED -> R.string.server_url_https_required
+        ServerUrlPolicy.Error.USER_INFO_NOT_ALLOWED -> R.string.server_url_user_info
+    })
 
     private fun makeWav(data: ByteArray): ByteArray {
         val out = ByteArrayOutputStream()

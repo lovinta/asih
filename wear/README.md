@@ -8,11 +8,13 @@ A Wear OS companion for Asih that records a short voice request, sends it to the
 ./gradlew :app:assembleDebug
 ```
 
-Install the debug APK on a Wear OS device. To run against the web app, start it from the repository root with `MOCK_MODE=1 npm start`, then set the server URL in the watch's **Server** settings. The emulator default is `http://10.0.2.2:3000`.
+Install the debug APK on a Wear OS device. Debug builds default to `http://10.0.2.2:3000`; release builds default to an empty URL and require configuration. A real watch needs an HTTPS server URL, such as your deployed web app. HTTP works only for `10.0.2.2`, `localhost`, or `127.0.0.1` for the emulator and local development. On the watch, open **Server**, enter the server URL, and choose **Save**. The app checks the URL when you save and again before sending.
+
+You may set `-PasihServerUrl=https://your-deployed-server.example` when building to supply a URL for either build type. This value is checked by the app at runtime as well.
 
 ## JVM screenshots and tests
 
-Screenshots are rendered on the JVM with Robolectric and Roborazzi; they are not emulator captures. The committed images are in `screenshots/`.
+Screenshots are rendered on the JVM with Robolectric and Roborazzi; they are not emulator captures. The committed square and black-masked round images are in `screenshots/`.
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest -Proborazzi.test.record=true

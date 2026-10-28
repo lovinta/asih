@@ -81,4 +81,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Wear OS watch app
 
-A native Wear OS companion app is in [`wear/`](wear/README.md). See its README for build and emulator setup.
+A native Wear OS companion app is in [`wear/`](wear/README.md). Real watches require an HTTPS server URL set in the watch's **Server** settings; HTTP is limited to emulator and local development hosts.

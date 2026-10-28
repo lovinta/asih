@@ -4,7 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("io.github.takahirom.roborazzi")
 }
-val serverUrl = providers.gradleProperty("asihServerUrl").orElse("http://10.0.2.2:3000")
+val serverUrlOverride = providers.gradleProperty("asihServerUrl")
+fun serverUrlField(value: String) = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 android {
     namespace = "app.asih.wear"
     compileSdk = 35
@@ -14,10 +15,13 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("String", "SERVER_URL", "\"${serverUrl.get()}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
+    buildTypes {
+        getByName("debug") { buildConfigField("String", "SERVER_URL", serverUrlField(serverUrlOverride.orElse("http://10.0.2.2:3000").get())) }
+        getByName("release") { buildConfigField("String", "SERVER_URL", serverUrlField(serverUrlOverride.orElse("").get())) }
+    }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     testOptions { unitTests.isIncludeAndroidResources = true }
