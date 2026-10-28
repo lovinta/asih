@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Wear OS app (Kotlin/Gradle) has its own build and generated files.
+    "wear/**",
   ]),
 ]);
 
