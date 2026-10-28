@@ -38,6 +38,18 @@ describe("/api/agent auto routing", () => {
     expect(body.trace.some((step: { tool: string }) => step.tool === "classify_intent")).toBe(false);
     expect(classifier).not.toHaveBeenCalled();
   });
+  it("keeps the Spanish emergency path", async () => {
+    vi.stubEnv("MOCK_MODE", "1");
+    const body = await (await POST(request("auto", "Tengo dolor de pecho", "es"))).json();
+    expect(body.result.kind).toBe("help");
+  });
+  it("passes spoken appointment details to read_document as data", async () => {
+    vi.stubEnv("MOCK_MODE", "1");
+    const body = await (await POST(request("auto", "My visit is on Tuesday, November 10, 2026 at 2:00 PM"))).json();
+    const readable = body.result.confirm.items.filter((item: { readable: boolean }) => item.readable);
+    expect(readable.length).toBeGreaterThan(0);
+    expect(body.trace.map((step: { tool: string }) => step.tool)).toContain("read_document");
+  });
   it("requires input.text", async () => {
     const response = await POST(request("auto"));
     expect(response.status).toBe(400);
