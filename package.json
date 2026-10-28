@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "eval": "node eval/cli.mjs",
     "e2e": "node e2e/smoke.mjs"
   },
   "dependencies": {

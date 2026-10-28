@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/eval/results/*
+!/eval/results/README.md
 /e2e/screenshots/*
 !/e2e/screenshots/.gitkeep
 
