@@ -20,4 +20,8 @@ class ReplyFormatterTest {
     @Test fun handlesErrorJson() {
         assertEquals("offline", formatReply("{\"error\":\"offline\"}", false).line2)
     }
+    @Test fun formatsUnexpectedAndInvalidResponsesInSpanish() {
+        assertEquals("Respuesta inesperada.", formatReply("{\"result\":{\"kind\":\"unknown\"}}", true).line2)
+        assertEquals("Respuesta del servidor no válida.", formatReply("not json", true).line2)
+    }
 }

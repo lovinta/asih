@@ -8,7 +8,21 @@ A Wear OS companion for Asih that records a short voice request, sends it to the
 ./gradlew :app:assembleDebug
 ```
 
-Install the debug APK on a Wear OS emulator or paired watch. To run against the web app, start it from the repository root with `MOCK_MODE=1 npm start`, then set the server URL in the watch's **Server** settings. The emulator default is `http://10.0.2.2:3000`.
+Install the debug APK on a Wear OS device. To run against the web app, start it from the repository root with `MOCK_MODE=1 npm start`, then set the server URL in the watch's **Server** settings. The emulator default is `http://10.0.2.2:3000`.
+
+## JVM screenshots and tests
+
+Screenshots are rendered on the JVM with Robolectric and Roborazzi; they are not emulator captures. The committed images are in `screenshots/`.
+
+```sh
+./gradlew :app:assembleDebug :app:testDebugUnitTest -Proborazzi.test.record=true
+```
+
+The mock-server end-to-end test is skipped unless `ASIH_E2E_URL` is set. Run it against an already-running mock server with:
+
+```sh
+ASIH_E2E_URL=http://localhost:3000 ./gradlew :app:testDebugUnitTest -Proborazzi.test.record=true
+```
 
 ## Data path
 

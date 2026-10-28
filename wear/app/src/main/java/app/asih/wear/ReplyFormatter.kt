@@ -5,7 +5,7 @@ import org.json.JSONObject
 data class Reply(val line1: String, val line2: String? = null, val needsCall: Boolean = false, val showFullDetails: Boolean = false)
 
 /** Formats the server's runFlow response into the short watch-safe reply. */
-fun formatReply(json: String, spanish: Boolean): Reply {
+fun formatReply(json: String, spanish: Boolean, unexpected: String = if (spanish) "Respuesta inesperada." else "Unexpected response.", invalid: String = if (spanish) "Respuesta del servidor no válida." else "Invalid server response."): Reply {
     return try {
         val root = JSONObject(json)
         if (root.has("error")) return Reply(if (spanish) "Algo salió mal." else "Something went wrong.", root.optString("error").take(100))
@@ -19,9 +19,9 @@ fun formatReply(json: String, spanish: Boolean): Reply {
                 else Reply(event.optString("name"), listOf(event.optString("date"), event.optString("time")).filter { it.isNotBlank() }.joinToString(", "), showFullDetails = true)
             }
             "A", "C" -> Reply(if (spanish) "Abra Asih en su teléfono para esto." else "Open Asih on your phone for this.")
-            else -> Reply(if (spanish) "Algo salió mal." else "Something went wrong.", "Unexpected response.")
+            else -> Reply(if (spanish) "Algo salió mal." else "Something went wrong.", unexpected)
         }
     } catch (_: Exception) {
-        Reply(if (spanish) "Algo salió mal." else "Something went wrong.", "Invalid server response.")
+        Reply(if (spanish) "Algo salió mal." else "Something went wrong.", invalid)
     }
 }
