@@ -12,6 +12,7 @@ The abstract avatar is a placeholder. TODO: replace it with the final avatar gen
 - **Find a group:** review an example community event, confirm when and where it meets, plan transportation, and edit an invitation.
 - **Check an ad:** review quoted warning cues, learn how to inspect ad settings and find the advertiser in Meta's Ad Library, then choose whether to share a note.
 - **Voice note:** record or upload audio, read the transcript, then edit a reply before opening WhatsApp or asking Asih about it.
+- **My activity notes:** save a private participation note on this phone and optionally edit a caption to share.
 
 All offline example content is synthetic and labeled **EXAMPLE (synthetic data)**.
 
@@ -35,6 +36,10 @@ Calls set `store: false` and request encrypted reasoning content. The app uses s
 ## Voice notes
 
 The browser converts uploaded or recorded audio to mono 16-bit PCM WAV at 16 kHz and posts it to this app's `/api/transcribe` endpoint. In live mode, the server sends Meta Voice Transcribe a multipart request with a JSON `request` part (`model`, `mode`, `audioEncoding`, and `languageBias`) and an `audio` part containing the WAV. `store: false` is not used by this endpoint; the transcribe client does not send that field. The data notice applies before recording or upload. The transcript is shown before any other action.
+
+## Private activity notes
+
+Activity notes and optional share captions are kept in this browser's localStorage under the app's `oah.` key prefix. They do not make a network request. “Delete everything” removes them with the other app data.
 
 The ad flow links to Meta's transparency tools: the "Why am I seeing this ad?" menu on each ad (walk-through steps in the app), [Accounts Center ad preferences](https://www.facebook.com/help/943858526073065), and [Ad Library](https://www.facebook.com/ads/library/). Invitations use WhatsApp click-to-chat (`https://wa.me/?text=...`); the person chooses recipients and sends. This project was built with Muse Code.
 
@@ -70,7 +75,7 @@ Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
 ## Known limits and TODOs
 
 - Confirm the transit link provider (Google Maps) with Vinta.
-- Spanish needs a fluent-speaker check, including the new voice-note strings.
+- Spanish needs a fluent-speaker check, including new voice-note and activity-note strings.
 - Indonesian support is deferred.
 - An evaluation set is not built yet.
 - There is no deployment.

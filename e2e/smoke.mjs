@@ -172,6 +172,16 @@ try {
   await page.getByTestId("voice-transcript").waitFor({ state: "visible", timeout });
   await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
 
+  await page.getByTestId("activity-notes").click({ timeout });
+  await page.getByLabel("What", { exact: true }).fill("Library visit", { timeout });
+  await page.getByRole("button", { name: "Save note" }).click({ timeout });
+  await page.locator("li").filter({ hasText: "Library visit" }).first().waitFor({ state: "visible", timeout });
+  await screenshot(page, "09-activity-note.png");
+  await page.getByRole("button", { name: "Back", exact: true }).click({ timeout });
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete everything" }).click({ timeout });
+  assert.equal(await page.evaluate(() => localStorage.getItem("oah.activityNotes")), null, "Delete everything left activity notes on the phone");
+
   await page.getByTestId("get-help").click({ timeout });
   await page.getByTestId("call-911").waitFor({ state: "visible", timeout });
   assert.equal(await page.getByTestId("call-911").getAttribute("href", { timeout }), "tel:911");

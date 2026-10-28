@@ -14,9 +14,11 @@ import MockBanner from "@/components/MockBanner";
 import SpeechControls from "@/components/SpeechControls";
 import DataNoticeDialog, { isNoticeAccepted } from "@/components/DataNotice";
 import VoiceNote from "@/components/VoiceNote";
+import ActivityNotes from "@/components/ActivityNotes";
+import { clearAppStorage } from "@/lib/activityNotes";
 import { LangProvider, useLang } from "@/components/Lang";
 
-type Screen = "home" | "help" | "A" | "B" | "C" | "voice";
+type Screen = "home" | "help" | "A" | "B" | "C" | "voice" | "activity";
 
 function App() {
   const { lang, t, setLang } = useLang();
@@ -45,12 +47,7 @@ function App() {
 
   const deleteEverything = useCallback(() => {
     if (!window.confirm(t.home.deleteConfirm)) return;
-    const owned: string[] = [];
-    for (let i = 0; i < window.localStorage.length; i++) {
-      const key = window.localStorage.key(i);
-      if (key?.startsWith("oah.")) owned.push(key);
-    }
-    for (const key of owned) window.localStorage.removeItem(key);
+    clearAppStorage(window.localStorage);
     // Keep the current language active after clearing.
     setLang(lang);
     setScreen("home");
@@ -110,6 +107,7 @@ function App() {
               <button type="button" data-testid="voice-note" className="primary big-button" onClick={() => setScreen("voice")}>
                 {t.home.voiceNote}
               </button>
+              <button type="button" data-testid="activity-notes" className="primary big-button" onClick={() => setScreen("activity")}>{t.home.activityNotes}</button>
               <button
                 type="button"
                 data-testid="flow-b"
@@ -141,6 +139,7 @@ function App() {
         {screen === "help" && <GetHelp onBack={() => setScreen("home")} />}
 
         {screen === "voice" && <div><button type="button" data-testid="screen-back" onClick={() => setScreen("home")}>{t.back}</button><VoiceNote lang={lang} needGate={needGate} openHelp={openHelp} openAdCheck={() => setScreen("C")} openAppointment={() => setScreen("A")} openGroups={() => setScreen("B")} /></div>}
+        {screen === "activity" && <div><button type="button" data-testid="screen-back" onClick={() => setScreen("home")}>{t.back}</button><ActivityNotes /></div>}
 
         {(screen === "A" || screen === "B" || screen === "C") && (
           <div>

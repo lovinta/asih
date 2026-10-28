@@ -29,6 +29,7 @@ export const en = {
     findGroup: "Find a group",
     checkAd: "Check an ad",
     voiceNote: "Voice note",
+    activityNotes: "My activity notes",
     readNoticeAgain: "Read the data notice again",
     deleteConfirm:
       "Delete everything this app saved on this phone? This cannot be undone.",
@@ -190,5 +191,18 @@ export const en = {
     openGroups: "Find a group",
     openWhatsapp: "Open in WhatsApp",
     shareButton: "Share",
+  },
+  activity: {
+    title: "My activity notes",
+    staysHere: "This note stays on this phone.",
+    what: "What",
+    when: "When",
+    how: "How it went (optional)",
+    save: "Save note",
+    caption: "Optional caption you may share",
+    listTitle: "Saved notes",
+    delete: "Delete",
+    deleteConfirm: "Delete this note from this phone?",
+    error: "Enter an activity and date. Keep the activity under 160 characters.",
   },
 };

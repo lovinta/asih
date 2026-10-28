@@ -56,6 +56,10 @@ describe("i18n key parity", () => {
     expect(leaves(es).join(" ")).not.toMatch(/[!¡]/);
   });
 
+  it("keeps activity note English free of praise and score language", () => {
+    expect(JSON.stringify(en.activity).toLowerCase()).not.toMatch(/great job|proud|amazing|well done|streak|score/);
+  });
+
   it("gives live mode the Asih persona rules", () => {
     const instructions = langInstructions("es");
     expect(instructions).toContain("You are Asih, an AI helper");

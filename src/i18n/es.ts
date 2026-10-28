@@ -34,6 +34,7 @@ export const es: Strings = {
     findGroup: "Buscar un grupo",
     checkAd: "Revisar un anuncio",
     voiceNote: "Nota de voz",
+    activityNotes: "Mis notas de actividades",
     readNoticeAgain: "Leer de nuevo el aviso de datos",
     deleteConfirm:
       "¿Borrar todo lo que esta aplicación guardó en este teléfono? Esto no se puede deshacer.",
@@ -196,5 +197,19 @@ export const es: Strings = {
     openGroups: "Encontrar un grupo",
     openWhatsapp: "Abrir en WhatsApp",
     shareButton: "Compartir",
+  },
+  activity: {
+    // TODO: needs check by a fluent speaker.
+    title: "Mis notas de actividades",
+    staysHere: "Esta nota permanece en este teléfono.",
+    what: "Qué",
+    when: "Cuándo",
+    how: "Cómo le fue (opcional)",
+    save: "Guardar nota",
+    caption: "Texto opcional que usted puede compartir",
+    listTitle: "Notas guardadas",
+    delete: "Eliminar",
+    deleteConfirm: "¿Eliminar esta nota de este teléfono?",
+    error: "Escriba una actividad y una fecha. Use menos de 160 caracteres para la actividad.",
   },
 };
