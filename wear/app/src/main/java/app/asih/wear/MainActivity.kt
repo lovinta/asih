@@ -207,11 +207,13 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                 val transcriptJson = transcribeResponse.body?.string().orEmpty()
                 if (!transcribeResponse.isSuccessful) throw IllegalStateException("HTTP ${transcribeResponse.code}: ${errorMessage(transcriptJson)}")
                 val text = JSONObject(transcriptJson).optString("transcript")
-                val payload = JSONObject().put("flow", "B").put("lang", lang).put("input", JSONObject().put("text", text)).toString()
+                val payload = JSONObject().put("flow", "auto").put("lang", lang).put("input", JSONObject().put("text", text)).toString()
                 val agentResponse = http.newCall(Request.Builder().url("$url/api/agent").post(payload.toRequestBody("application/json".toMediaType())).build()).execute()
                 val agentJson = agentResponse.body?.string().orEmpty()
                 if (!agentResponse.isSuccessful) throw IllegalStateException("HTTP ${agentResponse.code}: ${errorMessage(agentJson)}")
-                runOnUiThread { onResult(text, formatReply(agentJson, lang == "es", getString(R.string.unexpected_response), getString(R.string.invalid_server_response))) }
+                runOnUiThread { onResult(text, formatReply(agentJson, lang == "es", getString(R.string.unexpected_response), getString(R.string.invalid_server_response), mapOf(
+                    "appointment_heard" to getString(R.string.appointment_heard), "appointment_phone" to getString(R.string.appointment_phone), "appointment_fallback" to getString(R.string.appointment_fallback), "appointment_photo" to getString(R.string.appointment_photo), "phone_ad_line1" to getString(R.string.phone_ad_line1), "phone_ad_line2" to getString(R.string.phone_ad_line2), "unknown_line1" to getString(R.string.unknown_line1), "unknown_line2" to getString(R.string.unknown_line2)
+                ))) }
             } catch (e: Exception) {
                 val short = e.message?.take(100) ?: "Network error."
                 runOnUiThread { onResult("", Reply(getString(R.string.something_wrong), short)) }

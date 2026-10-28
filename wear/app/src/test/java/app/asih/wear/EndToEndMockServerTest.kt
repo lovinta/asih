@@ -40,8 +40,8 @@ class EndToEndMockServerTest {
             visible = activity.testRenderedText
             if (visible.isEmpty()) Thread.sleep(100)
         }
-        assertTrue("Reply did not appear; rendered text was $visible", visible.contains("Riverside Morning Walkers — EXAMPLE"))
-        assertTrue(visible.contains("Full details on your phone."))
+        assertTrue("Reply did not appear; rendered text was $visible", visible.contains("Appointment help is on your phone."))
+        assertTrue(visible.contains("Open Asih and take a photo of the letter."))
         capture(scenario, "06-reply-en.png")
         activity.finish()
         MainActivity.testDisableLazyLists = false

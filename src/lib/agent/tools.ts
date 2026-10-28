@@ -467,8 +467,11 @@ function naiveLetterFields(text: string, lang: Lang): LetterField[] {
   const fields: LetterField[] = [];
   const phone = text.match(/\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}/);
   const time = text.match(/\b\d{1,2}:\d{2}\s?(AM|PM)\b/i);
+  const date = text.match(/\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}\b/i);
   if (phone)
     fields.push({ kind: "phone", value: phone[0], readable: true, evidence_quote: phone[0] });
+  if (date)
+    fields.push({ kind: "date", value: date[0].replace(/,?\s+(\d{4})$/, ", $1"), readable: true, evidence_quote: date[0] });
   if (time)
     fields.push({ kind: "time", value: time[0], readable: true, evidence_quote: time[0] });
   if (fields.length === 0) {
