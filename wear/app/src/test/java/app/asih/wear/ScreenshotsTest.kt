@@ -14,6 +14,10 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.Shadows.shadowOf
 import java.io.File
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], qualifiers = "w227dp-h227dp-small-notlong-round-watch-xhdpi-keyshidden-nonav")
@@ -23,16 +27,17 @@ class ScreenshotsTest {
         prepare(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         assertEquals("NOTICE", MainActivity.testInstance!!.testCurrentScreen)
-        capture(scenario, "01-notice-en.png")
-        repeat(10) { swipe(scenario, 380f, 90f) }
-        tap(scenario, 225f, 420f)
+        capture(scenario, "01-notice-en.png", "01-notice-en-round.png")
+        MainActivity.testInstance!!.testNavigateScreen!!("HOME")
+        idle()
         assertEquals("HOME", MainActivity.testInstance!!.testCurrentScreen)
-        capture(scenario, "02-home-en.png")
-        tap(scenario, 225f, 405f)
+        assertRoundHomeLayout()
+        capture(scenario, "02-home-en.png", "02-home-en-round.png")
+        MainActivity.testInstance!!.testNavigateScreen!!("SETTINGS")
+        idle()
         assertEquals("SETTINGS", MainActivity.testInstance!!.testCurrentScreen)
-        capture(scenario, "03-settings-en.png")
+        capture(scenario, "03-settings-en.png", "03-settings-en-round.png")
         MainActivity.testInstance!!.finish()
-        MainActivity.testDisableLazyLists = false
     }
 }
 
@@ -44,18 +49,17 @@ class SpanishScreenshotsTest {
         prepare(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         assertEquals("NOTICE", MainActivity.testInstance!!.testCurrentScreen)
-        capture(scenario, "04-notice-es.png")
-        repeat(10) { swipe(scenario, 380f, 90f) }
-        tap(scenario, 225f, 420f)
+        capture(scenario, "04-notice-es.png", "04-notice-es-round.png")
+        MainActivity.testInstance!!.testNavigateScreen!!("HOME")
+        idle()
         assertEquals("HOME", MainActivity.testInstance!!.testCurrentScreen)
-        capture(scenario, "05-home-es.png")
+        assertRoundHomeLayout()
+        capture(scenario, "05-home-es.png", "05-home-es-round.png")
         MainActivity.testInstance!!.finish()
-        MainActivity.testDisableLazyLists = false
     }
 }
 
 internal fun prepare(acknowledged: Boolean, serverUrl: String? = null) {
-    MainActivity.testDisableLazyLists = true
     val context = ApplicationProvider.getApplicationContext<Context>()
     context.getSharedPreferences("asih", Context.MODE_PRIVATE).edit().clear()
         .putBoolean("notice_ack", acknowledged).apply {
@@ -64,9 +68,31 @@ internal fun prepare(acknowledged: Boolean, serverUrl: String? = null) {
 }
 
 internal fun idle() { shadowOf(android.os.Looper.getMainLooper()).idleFor(16, java.util.concurrent.TimeUnit.MILLISECONDS) }
-internal fun capture(scenario: ActivityScenario<MainActivity>, name: String) {
+internal fun capture(scenario: ActivityScenario<MainActivity>, name: String, roundName: String? = null) {
     val view = MainActivity.testInstance!!.window.decorView
-    view.drawToBitmap().captureRoboImage(File("../screenshots", name).absolutePath)
+    val bitmap = view.drawToBitmap()
+    bitmap.captureRoboImage(File("../screenshots", name).absolutePath)
+    if (roundName != null) {
+        val masked = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(masked)
+        canvas.drawColor(android.graphics.Color.BLACK)
+        val circle = Path().apply { addCircle(bitmap.width / 2f, bitmap.height / 2f, minOf(bitmap.width, bitmap.height) / 2f, Path.Direction.CW) }
+        canvas.save()
+        canvas.clipPath(circle)
+        canvas.drawBitmap(bitmap, 0f, 0f, Paint(Paint.ANTI_ALIAS_FLAG))
+        canvas.restore()
+        masked.compress(Bitmap.CompressFormat.PNG, 100, File("../screenshots", roundName).outputStream())
+    }
+}
+private fun assertRoundHomeLayout() {
+    val activity = MainActivity.testInstance!!
+    val title = activity.testTitleBounds ?: error("Title bounds were not recorded")
+    val intro = activity.testIntroBounds ?: error("Intro bounds were not recorded")
+    val density = activity.resources.displayMetrics.density
+    val safeInset = activity.resources.configuration.screenWidthDp * density * 0.1464f
+    val clockAreaBottom = 32f * density
+    org.junit.Assert.assertTrue("Title overlaps TimeText clock area: title=$title clockBottom=$clockAreaBottom", title.top >= clockAreaBottom)
+    org.junit.Assert.assertTrue("Home text exceeds round safe area: intro=$intro inset=$safeInset", intro.left >= safeInset && intro.right <= activity.window.decorView.width - safeInset)
 }
 internal fun tap(scenario: ActivityScenario<MainActivity>, x: Float, y: Float) = touch(scenario, x, y, x, y)
 internal fun swipe(scenario: ActivityScenario<MainActivity>, fromY: Float, toY: Float) = touch(scenario, 225f, fromY, 225f, toY)

@@ -30,9 +30,10 @@ class EndToEndMockServerTest {
         val activity = MainActivity.testInstance!!
         activity.testPcmSource = { ByteArray(3200) }
         assertEquals("Tap to talk", activity.testTalkButtonLabel)
-        tap(scenario, 225f, 225f)
+        activity.testTalkAction!!()
+        idle()
         assertEquals("Tap to stop", activity.testTalkButtonLabel)
-        tap(scenario, 225f, 225f)
+        activity.testTalkAction!!()
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20)
         var visible: List<String> = emptyList()
         while (System.nanoTime() < deadline && visible.isEmpty()) {
@@ -42,8 +43,7 @@ class EndToEndMockServerTest {
         }
         assertTrue("Reply did not appear; rendered text was $visible", visible.contains("Appointment help is on your phone."))
         assertTrue(visible.contains("Open Asih and take a photo of the letter."))
-        capture(scenario, "06-reply-en.png")
+        capture(scenario, "06-reply-en.png", "06-reply-en-round.png")
         activity.finish()
-        MainActivity.testDisableLazyLists = false
     }
 }

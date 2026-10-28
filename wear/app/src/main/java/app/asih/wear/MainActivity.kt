@@ -16,8 +16,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -52,10 +54,15 @@ import kotlin.concurrent.thread
 private enum class Screen { NOTICE, HOME, SETTINGS, REPLY }
 
 class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
-    internal companion object { var testInstance: MainActivity? = null; var testDisableLazyLists = false }
+    internal companion object { var testInstance: MainActivity? = null }
     internal var testRenderedText: List<String> = emptyList()
     internal var testCurrentScreen: String = ""
     internal var testTalkButtonLabel: String = ""
+    internal var testNavigateScreen: ((String) -> Unit)? = null
+    internal var testTalkAction: (() -> Unit)? = null
+    internal var testTitleBounds: Rect? = null
+    internal var testIntroBounds: Rect? = null
+    internal var testClockBounds: Rect? = null
     private var tts: TextToSpeech? = null
     private var ttsReady = false
     private var langCode = "en"
@@ -86,8 +93,12 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
 
     @Composable private fun WearApp() {
         val ctx = LocalContext.current
+        val configuration = LocalConfiguration.current
+        val round = configuration.isScreenRound
+        val roundInset = if (round) (configuration.screenWidthDp * 0.1464f).dp else 0.dp
         val prefs = remember { getSharedPreferences("asih", MODE_PRIVATE) }
         var screen by remember { mutableStateOf(if (prefs.getBoolean("notice_ack", false)) Screen.HOME else Screen.NOTICE) }
+        testNavigateScreen = { screen = Screen.valueOf(it) }
         testCurrentScreen = screen.name
         var statusText by remember { mutableStateOf("") }
         var transcript by remember { mutableStateOf("") }
@@ -101,56 +112,41 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
             if (granted) beginRecording(serverUrl, langCode, { isRecording = true; statusText = getString(R.string.listening) }, { isRecording = false }, { statusText = it }, { tr, r -> transcript = tr; reply = r; testRenderedText = listOfNotNull(r.line1, r.line2) + if (r.showFullDetails) listOf(getString(R.string.details_phone)) else emptyList(); statusText = ""; screen = Screen.REPLY; say(listOfNotNull(r.line1, r.line2).joinToString(". ")) })
             else statusText = getString(R.string.permission_denied)
         }
+        val talkAction: () -> Unit = {
+            if (isRecording) {
+                isRecording = false
+                stopAndSend(serverUrl, langCode, onStatus = { statusText = it }, onResult = { tr, r -> transcript = tr; reply = r; testRenderedText = listOfNotNull(r.line1, r.line2) + if (r.showFullDetails) listOf(getString(R.string.details_phone)) else emptyList(); statusText = ""; screen = Screen.REPLY; say(listOfNotNull(r.line1, r.line2).joinToString(". ")) })
+            } else if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                beginRecording(serverUrl, langCode, { isRecording = true; statusText = getString(R.string.listening) }, { isRecording = false }, { statusText = it }, { tr, r -> transcript = tr; reply = r; testRenderedText = listOfNotNull(r.line1, r.line2) + if (r.showFullDetails) listOf(getString(R.string.details_phone)) else emptyList(); statusText = ""; screen = Screen.REPLY; say(listOfNotNull(r.line1, r.line2).joinToString(". ")) })
+            } else permission.launch(Manifest.permission.RECORD_AUDIO)
+        }
+        testTalkAction = talkAction
         val noticeItems = listOf(getString(R.string.data_lead), getString(R.string.notice_title), getString(R.string.notice_body), getString(R.string.acknowledge))
-        Scaffold(timeText = { TimeText() }) {
+        Scaffold(timeText = { TimeText(modifier = Modifier.onGloballyPositioned { testClockBounds = it.boundsInRoot() }) }) {
             when (screen) {
-                Screen.NOTICE -> if (testDisableLazyLists) Column(Modifier.fillMaxSize().background(Color.Black).verticalScroll(rememberScrollState()).padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    noticeItems.forEachIndexed { i, value ->
-                        if (i == noticeItems.lastIndex) Button(onClick = { prefs.edit().putBoolean("notice_ack", true).apply(); screen = Screen.HOME }) { Text(value, fontSize = 17.sp) }
-                        else Text(value, color = Color.White, fontSize = if (i == 2) 17.sp else 19.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 8.dp))
-                    }
-                } else ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black), horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(12.dp)) {
+                Screen.NOTICE -> ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black).padding(horizontal = roundInset), horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(top = if (round) 48.dp else 12.dp, bottom = 24.dp), autoCentering = androidx.wear.compose.foundation.lazy.AutoCenteringParams(itemIndex = 0)) {
                     items(noticeItems.size) { i ->
                         if (i == noticeItems.lastIndex) Button(onClick = { prefs.edit().putBoolean("notice_ack", true).apply(); screen = Screen.HOME }) { Text(noticeItems[i], fontSize = 17.sp) }
                         else Text(noticeItems[i], color = Color.White, fontSize = if (i == 2) 17.sp else 19.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 8.dp))
                     }
                 }
-                Screen.HOME -> Column(Modifier.fillMaxSize().background(Color.Black).padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
-                    Text("Asih", color = Color.White, fontSize = 24.sp)
-                    Text(getString(R.string.intro), color = Color.White, fontSize = 15.sp, textAlign = TextAlign.Center)
+                Screen.HOME -> Column(Modifier.fillMaxSize().background(Color.Black).padding(start = roundInset + 10.dp, end = roundInset + 10.dp, top = if (round) 34.dp else 10.dp, bottom = 10.dp).semantics { }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+                    Text("Asih", color = Color.White, fontSize = 24.sp, modifier = Modifier.onGloballyPositioned { testTitleBounds = it.boundsInRoot() })
+                    Text(getString(R.string.intro), color = Color.White, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.onGloballyPositioned { testIntroBounds = it.boundsInRoot() })
                     testTalkButtonLabel = getString(if (isRecording) R.string.tap_stop else R.string.tap_talk)
-                    Button(onClick = {
-                        if (isRecording) { isRecording = false; stopAndSend(serverUrl, langCode, onStatus = { statusText = it }, onResult = { tr, r -> transcript = tr; reply = r; testRenderedText = listOfNotNull(r.line1, r.line2) + if (r.showFullDetails) listOf(getString(R.string.details_phone)) else emptyList(); statusText = ""; screen = Screen.REPLY; say(listOfNotNull(r.line1, r.line2).joinToString(". ")) }) }
-                        else if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { beginRecording(serverUrl, langCode, { isRecording = true; statusText = getString(R.string.listening) }, { isRecording = false }, { statusText = it }, { tr, r -> transcript = tr; reply = r; testRenderedText = listOfNotNull(r.line1, r.line2) + if (r.showFullDetails) listOf(getString(R.string.details_phone)) else emptyList(); statusText = ""; screen = Screen.REPLY; say(listOfNotNull(r.line1, r.line2).joinToString(". ")) }) }
-                        else permission.launch(Manifest.permission.RECORD_AUDIO)
-                    }, modifier = Modifier.size(112.dp).semantics { contentDescription = getString(if (isRecording) R.string.tap_stop else R.string.tap_talk) }) { Text(if (isRecording) getString(R.string.tap_stop) else getString(R.string.tap_talk), textAlign = TextAlign.Center, fontSize = 17.sp) }
+                    Button(onClick = talkAction, modifier = Modifier.size(112.dp).semantics { contentDescription = getString(if (isRecording) R.string.tap_stop else R.string.tap_talk) }) { Text(if (isRecording) getString(R.string.tap_stop) else getString(R.string.tap_talk), textAlign = TextAlign.Center, fontSize = 17.sp) }
                     if (statusText.isNotBlank()) Text(statusText, color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center)
                     Button(onClick = { draftUrl = serverUrl; screen = Screen.SETTINGS }) { Text(getString(R.string.server), fontSize = 14.sp) }
                 }
-                Screen.SETTINGS -> Column(Modifier.fillMaxSize().background(Color.Black).verticalScroll(rememberScrollState()).padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(getString(R.string.server_url), color = Color.White, fontSize = 13.sp)
-                    androidx.compose.foundation.text.BasicTextField(value = draftUrl, onValueChange = { draftUrl = it }, textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 15.sp), modifier = Modifier.fillMaxWidth().background(Color.DarkGray).padding(8.dp))
-                    Button(onClick = { serverUrl = draftUrl.trim().trimEnd('/'); prefs.edit().putString("server_url", serverUrl).apply(); screen = Screen.HOME }) { Text(getString(R.string.save)) }
-                    Button(onClick = { screen = Screen.HOME }) { Text(getString(R.string.back)) }
+                Screen.SETTINGS -> ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black).padding(horizontal = roundInset), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(top = if (round) 48.dp else 12.dp, bottom = 24.dp), autoCentering = androidx.wear.compose.foundation.lazy.AutoCenteringParams(itemIndex = 0)) {
+                    item { Text(getString(R.string.server_url), color = Color.White, fontSize = 16.sp) }
+                    item { androidx.compose.foundation.text.BasicTextField(value = draftUrl, onValueChange = { draftUrl = it }, textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 17.sp), modifier = Modifier.fillMaxWidth().background(Color.DarkGray).padding(8.dp)) }
+                    item { Button(onClick = { serverUrl = draftUrl.trim().trimEnd('/'); prefs.edit().putString("server_url", serverUrl).apply(); screen = Screen.HOME }) { Text(getString(R.string.save)) } }
+                    item { Button(onClick = { screen = Screen.HOME }) { Text(getString(R.string.back)) } }
                 }
                 Screen.REPLY -> {
                     val result = reply
-                    val replyItems: @Composable ColumnScope.() -> Unit = {
-                        if (result != null) {
-                            Text(result.line1, color = Color.White, fontSize = 20.sp, textAlign = TextAlign.Center)
-                            result.line2?.let { Text(it, color = Color.White, fontSize = 18.sp, textAlign = TextAlign.Center) }
-                            if (result.needsCall) {
-                                Text(getString(R.string.not_medical), color = Color.LightGray, fontSize = 13.sp, textAlign = TextAlign.Center)
-                                Button(onClick = { startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))) }) { Text(getString(R.string.call_911)) }
-                            } else if (result.showFullDetails) Text(getString(R.string.details_phone), color = Color.LightGray, fontSize = 13.sp, textAlign = TextAlign.Center)
-                            if (transcript.isNotBlank()) Text(getString(R.string.you_said, transcript), color = Color.LightGray, fontSize = 13.sp, textAlign = TextAlign.Center)
-                            if (!ttsReady) Text(getString(R.string.tts_unavailable), color = Color.LightGray, fontSize = 13.sp, textAlign = TextAlign.Center)
-                            Button(onClick = { say(listOfNotNull(result.line1, result.line2).joinToString(". ")) }) { Text(getString(R.string.read_again)) }
-                        }
-                        Button(onClick = { screen = Screen.HOME }) { Text(getString(R.string.back)) }
-                    }
-                    if (testDisableLazyLists) Column(Modifier.fillMaxSize().background(Color.Black).verticalScroll(rememberScrollState()).padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp), content = replyItems)
-                    else ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black), horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(12.dp)) {
+                    ScalingLazyColumn(modifier = Modifier.fillMaxSize().background(Color.Black).padding(horizontal = roundInset), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(top = if (round) 48.dp else 12.dp, bottom = 24.dp), autoCentering = androidx.wear.compose.foundation.lazy.AutoCenteringParams(itemIndex = 0)) {
                         if (result != null) {
                             item { Text(result.line1, color = Color.White, fontSize = 20.sp, textAlign = TextAlign.Center) }
                             result.line2?.let { item { Text(it, color = Color.White, fontSize = 18.sp, textAlign = TextAlign.Center) } }
