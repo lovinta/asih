@@ -6,16 +6,16 @@ const { cases } = JSON.parse(readFileSync("eval/cases.json", "utf8")) as { cases
 
 describe("synthetic evaluation set", () => {
   it("validates dataset schema and coverage", () => { expect(() => validateCases(cases)).not.toThrow(); });
-  it("runs the dev split through mock core and returns real outcomes", async () => {
+  it("rejects unknown expectation check types", () => {
+    const invalid = structuredClone(cases); invalid[0].expect[0].check = "madeUp";
+    expect(() => validateCases(invalid)).toThrow(/Unknown check type/);
+  });
+  it("runs dev split in mock mode", async () => {
     const result = await evaluate({ split: "dev", runs: 1 });
-    expect(result.mode).toContain("MOCK");
-    expect(result.outcomes.length).toBeGreaterThan(0);
+    expect(result.mode).toContain("MOCK"); expect(result.outcomes.length).toBeGreaterThan(0);
     expect(result.outcomes.every(x => ["pass", "fail", "skip"].includes(x.status))).toBe(true);
   });
-  it("rejects live runs without a key", async () => {
-    const previous = process.env.META_API_KEY;
-    delete process.env.META_API_KEY;
-    await expect(main(["--live"])).rejects.toThrow("requires META_API_KEY");
-    if (previous) process.env.META_API_KEY = previous;
+  it("refuses live runs because live evaluation is not implemented", async () => {
+    await expect(main(["--live"])).rejects.toThrow("NOT implemented yet");
   });
 });
