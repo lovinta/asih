@@ -11,7 +11,8 @@ function canSpeak(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
-export default function SpeechControls({ text, lang }: { text: string; lang: Lang }) {
+// showText=false when the screen already shows the same text in large type right above the controls.
+export default function SpeechControls({ text, lang, showText = true }: { text: string; lang: Lang; showText?: boolean }) {
   const { t } = useLang();
   const [rate, setRate] = useState(DEFAULT_SPEECH_RATE[lang]);
   const [paused, setPaused] = useState(false);
@@ -38,7 +39,7 @@ export default function SpeechControls({ text, lang }: { text: string; lang: Lan
 
   return (
     <div className="speech">
-      <p className="speech-text">{text}</p>
+      {showText && <p className="speech-text">{text}</p>}
       <div className="button-row">
         <button type="button" onClick={read}>
           {t.readAloud}

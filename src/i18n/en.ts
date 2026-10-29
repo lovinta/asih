@@ -172,6 +172,7 @@ export const en = {
       "Moving to WhatsApp counts as a warning sign when it is asked before you can check who they are.",
   },
   voice: {
+    checkedNotSaved: "Checked. Nothing is saved yet. To save it and get a calendar file, use Appointment help.",
     title: "Voice note",
     startRecording: "Start recording",
     stopRecording: "Stop recording",

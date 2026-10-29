@@ -25,6 +25,7 @@ export default function VoiceNote({ lang, needGate, openHelp, openAdCheck, openA
   const [replyOpen, setReplyOpen] = useState(false);
   const [routed, setRouted] = useState<Routed | null>(null);
   const [trace, setTrace] = useState<Step[]>([]);
+  const [checked, setChecked] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
@@ -62,7 +63,8 @@ export default function VoiceNote({ lang, needGate, openHelp, openAdCheck, openA
       const processor = context.createScriptProcessor(4096, 2, 1); processorRef.current = processor; chunksRef.current = [];
       processor.onaudioprocess = (event) => { const channels = Array.from({ length: event.inputBuffer.numberOfChannels }, (_, i) => new Float32Array(event.inputBuffer.getChannelData(i))); chunksRef.current.push(resampleMono(channels, context.sampleRate)); };
       source.connect(processor); processor.connect(context.destination);
-      // TODO: confirm Voice Transcribe's max audio length in Meta docs; I could not verify it.
+      // Meta's docs allow up to 10 minutes and 32 MB per transcribe request
+      // (https://dev.meta.ai/docs/api-reference/voice/transcribe); the app stops at 2 minutes to keep notes short and cost low.
       stopTimer.current = window.setTimeout(() => void stop(), 120000);
     } catch { recordingRef.current = false; setRecording(false); setError(t.voice.micError); }
   };
@@ -91,7 +93,7 @@ export default function VoiceNote({ lang, needGate, openHelp, openAdCheck, openA
       const data = await response.json() as { result?: Routed; trace?: Step[]; error?: string };
       if (!response.ok) throw new Error(data.error ?? t.voice.transcribeError);
       if (data.result?.kind === "help") { openHelp(); return; }
-      setRouted(data.result ?? null); setTrace(data.trace ?? []);
+      setRouted(data.result ?? null); setTrace(data.trace ?? []); setChecked(false);
     } catch (err) { setError(err instanceof Error ? err.message : t.voice.transcribeError); }
     finally { setBusy(false); }
   };
@@ -110,9 +112,10 @@ export default function VoiceNote({ lang, needGate, openHelp, openAdCheck, openA
     {busy && <p>{t.loading}</p>}{error && <p role="alert" className="warning">{error}</p>}
     {transcript && <>
       {!wav && <p className="example-tag">{t.exampleLabel}</p>}
-      <h2>{t.voice.transcriptTitle}</h2><p className="big-text" data-testid="voice-transcript">{transcript}</p><SpeechControls text={transcript} lang={lang} />
-      {!routed && <div className="button-column"><button type="button" className="primary big-button" disabled={busy} onClick={() => setReplyOpen(true)}>{t.voice.replyDraftTitle}</button>{replyOpen && <><textarea aria-label={t.voice.replyDraftTitle} data-testid="voice-draft" placeholder={t.voice.replyPlaceholder} value={draft} onChange={(e) => setDraft(e.target.value)} /><button type="button" disabled={!draft.trim()} onClick={() => window.open(whatsappShareUrl(draft), "_blank", "noopener,noreferrer")}>{t.voice.openWhatsapp}</button>{"share" in navigator && <button type="button" disabled={!draft.trim()} onClick={() => void share()}>{t.voice.shareButton}</button>}</>}<button type="button" disabled={busy} onClick={() => void ask()}>{t.voice.askAsih}</button></div>}
-      {routed?.kind === "A" && routed.confirm && <ConfirmStep initial={routed.confirm} lang={lang} unreadableNote={t.flowA.unreadableNote} onDone={() => undefined} />}
+      <h2>{t.voice.transcriptTitle}</h2><p className="big-text" data-testid="voice-transcript">{transcript}</p><SpeechControls text={transcript} lang={lang} showText={false} />
+      {!routed && <div className="button-column"><button type="button" className="primary big-button" disabled={busy} onClick={() => setReplyOpen(true)}>{t.voice.replyDraftTitle}</button>{replyOpen && <><textarea className="big-field" aria-label={t.voice.replyDraftTitle} data-testid="voice-draft" placeholder={t.voice.replyPlaceholder} value={draft} onChange={(e) => setDraft(e.target.value)} /><button type="button" disabled={!draft.trim()} onClick={() => window.open(whatsappShareUrl(draft), "_blank", "noopener,noreferrer")}>{t.voice.openWhatsapp}</button>{"share" in navigator && <button type="button" disabled={!draft.trim()} onClick={() => void share()}>{t.voice.shareButton}</button>}</>}<button type="button" disabled={busy} onClick={() => void ask()}>{t.voice.askAsih}</button></div>}
+      {routed?.kind === "A" && routed.confirm && <ConfirmStep initial={routed.confirm} lang={lang} unreadableNote={t.flowA.unreadableNote} onDone={() => setChecked(true)} />}
+      {routed?.kind === "A" && checked && <><p className="big-text" data-testid="voice-checked">{t.voice.checkedNotSaved}</p><button type="button" className="big-button" onClick={openAppointment}>{t.voice.openAppointment}</button></>}
       {routed?.kind === "B" && <div className="big-text"><p>{routed.event?.name}</p><p>{routed.event?.date} {routed.event?.time} {routed.event?.place}</p><p>{routed.activities?.summary?.source}</p><p>{routed.plan?.meetTips}</p></div>}
       {routed?.kind === "phone_ad" && <><p className="big-text">{t.voice.phoneAd}</p><button type="button" className="big-button" onClick={openAdCheck}>{t.voice.openAdCheck}</button></>}
       {routed?.kind === "unknown" && <><p className="big-text">{t.voice.unknown}</p><div className="button-column"><button type="button" onClick={openAppointment}>{t.voice.openAppointment}</button><button type="button" onClick={openGroups}>{t.voice.openGroups}</button><button type="button" onClick={openAdCheck}>{t.voice.openAdCheck}</button></div></>}

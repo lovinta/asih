@@ -372,3 +372,16 @@ p a {
     animation: none;
   }
 }
+
+.big-field {
+  display: block;
+  width: 100%;
+  min-height: 6rem;
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+  padding: 0.6rem;
+  border: 3px solid #111;
+  border-radius: 8px;
+  color: #111;
+  background: #fff;
+}

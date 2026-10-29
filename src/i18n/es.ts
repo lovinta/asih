@@ -177,6 +177,7 @@ export const es: Strings = {
       "Pasar a WhatsApp cuenta como señal de advertencia cuando se pide antes de que pueda comprobar quiénes son.",
   },
   voice: {
+    checkedNotSaved: "Revisado. Todavía no se guardó nada. Para guardarlo y obtener un archivo de calendario, use Ayuda con citas.",
     // TODO: needs check by a fluent speaker.
     title: "Nota de voz",
     startRecording: "Empezar a grabar",
