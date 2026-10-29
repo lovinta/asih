@@ -6,7 +6,7 @@ An agent for older adults' needs and quality of life. It is not a chatbot: it ha
 
 Asih is a plain-spoken AI helper. Asih is honest about being an AI, not a person or doctor. The person decides every step. Use short, plain sentences, with care and patience. Do not use pet names or exclamation marks. In Spanish, use formal “usted.”
 
-The abstract avatar is a placeholder. TODO: replace it with the final avatar generated with Muse Image (`muse-image-1.0`) once the app has a Meta API key.
+The Asih mark (`public/asih-avatar.svg`, also the watch launcher icon) is hand-drawn and abstract: a calm ring with a small spark that signals AI, with no face. TODO: a Muse Image (`muse-image-1.0`) version could replace it later, once the app has a Meta API key.
 
 - **Appointment help:** read an example letter, confirm each extracted item, then save the visit or download a calendar file.
 - **Find a group:** review an example community event, confirm when and where it meets, plan transportation, and edit an invitation.
@@ -80,9 +80,20 @@ No model call asks the API to store its response (`store: false`). The app repla
 
 ## Prior work disclosure
 
-TODO (Vinta): state where the new work starts and any prior work
+What the repository shows (checkable with `git log`):
 
-Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
+- This repository was created for the Meta Global AI Developer Hackathon. The first commit is Oct 27, 2026, 18:06 ET ("Scaffold Next.js app, MIT license, build spec"); the event ran from Oct 26, 2026. All commits in it were made during the event.
+- The web app (`src/`), Wear OS app (`wear/`), evaluation set (`eval/`), browser smoke test (`e2e/`) and synthetic example content (`src/fixtures/`) were written in this repository during the event. The starting point was the standard Next.js app template, as the first commit's name says.
+- The build spec ([docs/SPEC.md](docs/SPEC.md)) is taken from Vinta's plan written for this hackathon (Oct 27, 2026).
+- Open-source dependencies are used under their own licenses and are not claimed as our work: Next.js, React, the OpenAI JavaScript SDK (pointed at Meta's API), Vitest, Playwright, and on the watch AndroidX, Jetpack Compose for Wear OS, OkHttp, Robolectric and Roborazzi. See `package.json` and `wear/app/build.gradle.kts`.
+- Model calls use Meta's Model API (Muse Spark 1.3, Muse Wonder 1.0, Muse Voice Transcribe 1.0).
+
+Needs Vinta (placeholders, not yet answered):
+
+- TODO (Vinta): Any prior code, designs or research of yours that this builds on, and where the new work starts. Write "None" if there is none.
+- TODO (Vinta): Background research. Do not cite any literature review as your own until you confirm it is yours alone.
+- TODO (Vinta): How to describe AI coding help used to build this (this README already says "This project was built with Muse Code").
+- TODO (Vinta): Team members. The Indie track asks the person who submits to list all team members.
 
 ## Known limits and TODOs
 

@@ -34,6 +34,6 @@ Watch microphone audio is encoded as a mono 16 kHz PCM WAV and sent to your Asih
 
 - TODO: Flows A and C need a photo, which stays on the phone; the watch directs people to Asih on their phone.
 - TODO: HTTPS for real devices and real device pairing guidance.
-- TODO: replace the placeholder with the final avatar via Muse Image.
+- The launcher icon is an adaptive vector icon (`res/mipmap-anydpi-v26/`) using the same hand-drawn Asih mark as the web app; preview in `screenshots/launcher-icon-preview.png`. TODO: a Muse Image version could replace it later.
 
 There is no Play Store listing.
