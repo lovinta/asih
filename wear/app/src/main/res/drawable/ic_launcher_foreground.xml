@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Asih launcher foreground: the same hand-drawn abstract mark as public/asih-avatar.svg (faceless ring + small AI spark),
+     scaled into the 66dp adaptive-icon safe zone of a 108dp canvas. TODO: a Muse Image version could replace it later. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M35.44,56.06 a16.50,16.50 0 1,0 33.00,0 a16.50,16.50 0 1,0 -33.00,0" android:strokeColor="#FFFFFF" android:strokeWidth="6.19" android:fillColor="#00000000"/>
+    <path android:pathData="M57.44,40.94 a9.62,9.62 0 1,0 19.25,0 a9.62,9.62 0 1,0 -19.25,0" android:fillColor="@color/asih_icon_background"/>
+    <path android:pathData="M67.06,32.69 C67.89,37.77 70.22,40.11 75.31,40.94 C70.22,41.76 67.89,44.10 67.06,49.19 C66.24,44.10 63.90,41.76 58.81,40.94 C63.90,40.11 66.24,37.77 67.06,32.69 Z" android:fillColor="#FFD34D"/>
+</vector>
