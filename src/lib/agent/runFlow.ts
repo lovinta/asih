@@ -32,6 +32,8 @@ import {
   scamMessage,
   FIXED_SCAM_WORDING_EN,
   FIXED_SCAM_WORDING_ES,
+  NO_CUES_SUFFIX_EN,
+  NO_CUES_SUFFIX_ES,
 } from "../safety/scamWording";
 import { createConfirmState, saveConfirmed, type ConfirmState } from "../confirm";
 import {
@@ -199,9 +201,16 @@ function finalTextOf(output: ResponseOutputItem[]): string {
 
 // Flow C must always end with the fixed wording, even if the model (or an
 // injected ad) tried to say otherwise.
+// When no cues were found, the "That doesn't mean it's safe." suffix must follow
+// the fixed wording too, even if the model already wrote the fixed wording.
 function ensureFixedWording(text: string, cues: string[], lang: Lang): string {
-  if (text.includes(FIXED_SCAM_WORDING_EN) || text.includes(FIXED_SCAM_WORDING_ES)) {
-    return text;
+  for (const [fixed, suffix] of [
+    [FIXED_SCAM_WORDING_EN, NO_CUES_SUFFIX_EN],
+    [FIXED_SCAM_WORDING_ES, NO_CUES_SUFFIX_ES],
+  ] as const) {
+    if (!text.includes(fixed)) continue;
+    if (cues.length > 0 || text.includes(`${fixed} ${suffix}`)) return text;
+    return text.replace(fixed, `${fixed} ${suffix}`);
   }
   return `${text}\n\n${scamMessage(cues, lang)}`;
 }
