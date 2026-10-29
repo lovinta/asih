@@ -62,6 +62,18 @@ npm run build && E2E_PORT=3125 npm run e2e
 
 The browser test expects a production build to exist and system Chrome at `/usr/bin/google-chrome`. The smoke test runs against the deterministic mock mode and saves screenshots in `e2e/screenshots/`.
 
+## Deploy checklist
+
+There is no deployment yet. Details, env vars and limits are in [docs/DEPLOY.md](docs/DEPLOY.md).
+
+- [ ] Vinta chooses a host (generic Node host or Vercel; not chosen).
+- [ ] `npm ci && npm run build && npm start` on Node `>=20.9.0`, behind HTTPS.
+- [ ] Set `MOCK_MODE=1` for a public demo. Mock mode needs no key and makes no network calls.
+- [ ] Set `META_API_KEY` in the host's secret settings only if Vinta approves live mode.
+- [ ] Know the spend cap: $10/day per server process, in memory; not shared across serverless instances; resets on restart.
+- [ ] Vercel only: request bodies over 4.5 MB fail, so long voice notes (over about 2 min 20 s) fail there.
+- [ ] Smoke test `/`, `/api/mode`, one flow, and the voice note; set the watch's Server URL.
+
 ## Privacy
 
 No model call asks the API to store its response (`store: false`). The app replays encrypted reasoning statelessly and never uses `previous_response_id` or a conversation. The data notice explains what Meta may still retain under Terms section 4.4. Saved visits, questions, and notice acknowledgment stay in this browser's localStorage; “Delete everything” clears this app's saved entries on this phone.
@@ -77,11 +89,10 @@ Repository created Oct 27, 2026 for the Meta Global AI Developer Hackathon.
 - Confirm the transit link provider (Google Maps) with Vinta.
 - Spanish needs a fluent-speaker check, including new voice-note and activity-note strings.
 - Indonesian support is deferred.
-- An evaluation set is not built yet.
-- There is no deployment.
+- There is no deployment. See [docs/DEPLOY.md](docs/DEPLOY.md).
 - Choose the language before starting a flow: switching EN/ES while a result is on screen changes the app's own text, but text the agent already produced stays in the language it ran in.
 - Live mode (with `META_API_KEY`) has not been run against the real Meta Model API yet; only mock mode is tested end to end.
-- Not built yet from the plan: the evaluation set (about 70 cases), passcode, optional check-in and other stretch items.
+- Not built yet from the plan: passcode, optional check-in and other stretch items. The evaluation set is in [`eval/`](eval/README.md).
 - Muse Image is not used yet (the plan names no feature for it).
 
 ## License
