@@ -1,0 +1,29 @@
+{
+  "selectedFlows": [
+    "synthetic_audio_transcription"
+  ],
+  "flows": [
+    {
+      "name": "synthetic_audio_transcription",
+      "pass": true,
+      "notes": [
+        "Used a synthetic spoken English sentence.",
+        "Live transcription route returned a string response."
+      ],
+      "models": [
+        "muse-voice-transcribe-1.0"
+      ],
+      "tokenCounts": null,
+      "estimatedCostUsd": 0.00022445,
+      "outputExcerpt": "Transcript: this is an example voice note. Please call me back tomorrow."
+    }
+  ],
+  "totals": {
+    "calls": 1,
+    "tokenCounts": {
+      "input": 0,
+      "output": 0
+    },
+    "estimatedCostUsd": 0.00022445
+  }
+}
