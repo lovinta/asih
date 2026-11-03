@@ -1,0 +1,98 @@
+{
+  "flows": [
+    {
+      "name": "chat_intent_and_appointment_text_plus_image",
+      "pass": false,
+      "notes": [
+        "App output guard did not pass"
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 75084,
+        "output": 3585
+      },
+      "estimatedCostUsd": 0.10909125,
+      "outputExcerpt": ""
+    },
+    {
+      "name": "scam_ad_en",
+      "pass": false,
+      "notes": [
+        "App output guard did not pass"
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 3396,
+        "output": 2034
+      },
+      "estimatedCostUsd": 0.0128895,
+      "outputExcerpt": ""
+    },
+    {
+      "name": "scam_ad_es",
+      "pass": false,
+      "notes": [
+        "App output guard did not pass"
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 8786,
+        "output": 2805
+      },
+      "estimatedCostUsd": 0.02290375,
+      "outputExcerpt": ""
+    },
+    {
+      "name": "group_invite_generation",
+      "pass": false,
+      "notes": [
+        "App output guard did not pass"
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 3223,
+        "output": 1696
+      },
+      "estimatedCostUsd": 0.01123675,
+      "outputExcerpt": ""
+    },
+    {
+      "name": "synthetic_audio_transcription",
+      "pass": true,
+      "notes": [
+        "Used a one-second synthetic tone because no TTS binary was available.",
+        "Live transcription route returned a string response."
+      ],
+      "models": [
+        "muse-voice-transcribe-1.0"
+      ],
+      "tokenCounts": null,
+      "estimatedCostUsd": 0.00005,
+      "outputExcerpt": "Transcript response received (0 characters)."
+    }
+  ],
+  "totals": {
+    "calls": 13,
+    "tokenCounts": {
+      "input": 90489,
+      "output": 10120
+    },
+    "estimatedCostUsd": 0.15617125
+  }
+}
