@@ -91,7 +91,7 @@ export async function createResponse(
     cached_input_tokens: response.usage?.input_tokens_details?.cached_tokens ?? 0,
   };
   recordSpend(usage);
-  logMetaCall(opts?.flow ?? "unknown", opts?.step ?? "response", usage);
+  logMetaCall(opts?.flow ?? "unknown", opts?.step ?? "response", params.model, usage);
   return {
     output: response.output,
     usage: {

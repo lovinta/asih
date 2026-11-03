@@ -1,0 +1,53 @@
+{
+  "selectedFlows": [
+    "scam_ad_en",
+    "scam_ad_es"
+  ],
+  "flows": [
+    {
+      "name": "scam_ad_en",
+      "pass": false,
+      "notes": [
+        "guard blocked",
+        "guard reason: Blocked: cure-claim."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 3510,
+        "output": 2295
+      },
+      "estimatedCostUsd": 0.01414125,
+      "outputExcerpt": "Message: I can see these warning signs. I can't tell whether this is real or whether the product works. Check with someone you trust before paying or sharing details."
+    },
+    {
+      "name": "scam_ad_es",
+      "pass": false,
+      "notes": [
+        "guard blocked",
+        "guard reason: Blocked: live-check."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 4282,
+        "output": 4497
+      },
+      "estimatedCostUsd": 0.02446475,
+      "outputExcerpt": "Message: Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de su confianza antes de pagar o compartir datos."
+    }
+  ],
+  "totals": {
+    "calls": 5,
+    "tokenCounts": {
+      "input": 7792,
+      "output": 6792
+    },
+    "estimatedCostUsd": 0.038606
+  }
+}

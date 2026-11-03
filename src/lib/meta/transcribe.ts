@@ -3,7 +3,8 @@
 // https://api.meta.ai/v1/asr/transcribe with parts `request` (JSON) and
 // `audio`. Mock mode returns a fixture transcript: no key, no network.
 import { isMockMode, getApiKey } from "./mode";
-import { checkSpendGuard, recordVoiceSpend } from "./spend";
+import { VOICE_MODEL } from "./client";
+import { checkSpendGuard, logVoiceCall, recordVoiceSpend } from "./spend";
 import {
   EXAMPLE_VOICE_TRANSCRIPT_EN,
   EXAMPLE_VOICE_TRANSCRIPT_ES,
@@ -34,7 +35,7 @@ export async function transcribe(
   // Rough duration estimate for 16 kHz mono 16-bit PCM (minus WAV header).
   const seconds = Math.max(1, (wavBuffer.byteLength - 44) / 32000);
   const requestPart = JSON.stringify({
-    model: "muse-voice-transcribe-1.0",
+    model: VOICE_MODEL,
     mode: "PUSH_TO_TALK",
     audioEncoding: "WAV",
     languageBias: languageBias(lang),
@@ -57,5 +58,6 @@ export async function transcribe(
   if (!res.ok) throw new Error(`Transcribe failed with status ${res.status}.`);
   const data = (await res.json()) as { transcript?: string; text?: string };
   recordVoiceSpend(seconds / 3600);
+  logVoiceCall("transcribe", "audio-transcription", VOICE_MODEL, seconds);
   return { transcript: data.transcript ?? data.text ?? "", mock: false };
 }

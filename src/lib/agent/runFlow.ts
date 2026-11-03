@@ -256,7 +256,7 @@ async function liveModelTurn(
 }
 
 // Live second output-guard check via muse-spark-1.3, returning {pass}.
-async function liveGuardCheck(text: string, lang: Lang): Promise<{ pass: boolean }> {
+export async function liveGuardCheck(text: string, lang: Lang): Promise<{ pass: boolean }> {
   try {
     const response = await createResponse(
       {
@@ -274,7 +274,12 @@ async function liveGuardCheck(text: string, lang: Lang): Promise<{ pass: boolean
           format: {
             type: "json_schema",
             name: "guard",
-            schema: { type: "object", properties: { pass: { type: "boolean" } } },
+            schema: {
+              type: "object",
+              properties: { pass: { type: "boolean" } },
+              required: ["pass"],
+              additionalProperties: false,
+            },
             strict: true,
           },
         },
@@ -292,6 +297,11 @@ async function liveGuardCheck(text: string, lang: Lang): Promise<{ pass: boolean
   } catch {
     return { pass: false };
   }
+}
+
+function outputGuardSummary(guard: { pass: boolean; reasons: string[] }): string {
+  if (!guard.pass) return `Blocked: ${guard.reasons.join(", ") || "unknown"}.`;
+  return isMockMode() ? "Rules only (mock mode)." : "Rules plus live check.";
 }
 
 function exampleEventSummary(): SharedEventSummary {
@@ -498,7 +508,7 @@ async function finish(
     });
     trace.push({
       tool: "output_guard",
-      summary: isMockMode() ? "Rules only (mock mode)." : "Rules plus live check.",
+      summary: outputGuardSummary(guard),
       ok: guard.pass,
     });
     return {
@@ -528,7 +538,7 @@ async function finish(
     });
     trace.push({
       tool: "output_guard",
-      summary: isMockMode() ? "Rules only (mock mode)." : "Rules plus live check.",
+      summary: outputGuardSummary(guard),
       ok: guard.pass,
     });
     // Fixture events only in mock mode; live uses the shared listing summary.
@@ -568,7 +578,7 @@ async function finish(
   });
   trace.push({
     tool: "output_guard",
-    summary: isMockMode() ? "Rules only (mock mode)." : "Rules plus live check.",
+    summary: outputGuardSummary(guard),
     ok: guard.pass,
   });
   return {

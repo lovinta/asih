@@ -2,7 +2,8 @@
 // (America/New_York date) plus a reservation for the call in flight would
 // exceed the cap. In-memory counter is fine for v1.
 // Prices: Spark $1.25/M input, $0.15/M cached input, $4.25/M output;
-// Voice $0.18/hour. Only token counts are logged, never user content.
+// Voice $0.18/hour. Usage logs contain model IDs and counts/duration only,
+// never user content.
 
 export const SPEND_CAP_USD = 10;
 export const RESERVATION_USD = 0.3;
@@ -80,16 +81,33 @@ export function checkSpendGuard(
   if (spent + reservationUsd > SPEND_CAP_USD) throw new SpendExceededError(spent);
 }
 
-// Log counts only. Never call with prompts, images, or transcripts.
-export function logMetaCall(flow: string, step: string, usage: Usage): void {
+// Log model ID and counts only. Never call with prompts, images, or transcripts.
+export function logMetaCall(
+  flow: string,
+  step: string,
+  model: string,
+  usage: Usage,
+): void {
   console.log(
     JSON.stringify({
       flow,
       step,
+      model,
       input_tokens: usage.input_tokens,
       output_tokens: usage.output_tokens,
     }),
   );
+}
+
+// Voice calls have duration-based pricing rather than token usage. Keep the
+// same content-free server log shape while recording only the model and time.
+export function logVoiceCall(
+  flow: string,
+  step: string,
+  model: string,
+  audioSeconds: number,
+): void {
+  console.log(JSON.stringify({ flow, step, model, audio_seconds: audioSeconds }));
 }
 
 // Test-only reset for the in-memory counter.

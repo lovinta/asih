@@ -6,8 +6,9 @@ if (process.env.LIVE !== "1") {
 
 const { spawn, spawnSync } = await import("node:child_process");
 const { createServer } = await import("node:net");
-const { mkdir, writeFile } = await import("node:fs/promises");
-const { dirname, resolve } = await import("node:path");
+const { mkdir, mkdtemp, readFile, rm, writeFile } = await import("node:fs/promises");
+const { tmpdir } = await import("node:os");
+const { dirname, join, resolve } = await import("node:path");
 const { fileURLToPath } = await import("node:url");
 const { setTimeout: delay } = await import("node:timers/promises");
 
@@ -44,17 +45,25 @@ function addModelLog(record) {
     !record ||
     typeof record.flow !== "string" ||
     typeof record.step !== "string" ||
-    !Number.isFinite(record.input_tokens) ||
-    !Number.isFinite(record.output_tokens)
+    typeof record.model !== "string"
   ) return;
 
-  const inputTokens = record.input_tokens;
-  const outputTokens = record.output_tokens;
-  const cost = sparkCost(inputTokens, outputTokens);
+  let inputTokens = null;
+  let outputTokens = null;
+  let cost;
+  if (record.model === "muse-voice-transcribe-1.0") {
+    if (!Number.isFinite(record.audio_seconds)) return;
+    cost = Math.max(0, record.audio_seconds) / 3600 * 0.18;
+  } else {
+    if (!Number.isFinite(record.input_tokens) || !Number.isFinite(record.output_tokens)) return;
+    inputTokens = record.input_tokens;
+    outputTokens = record.output_tokens;
+    cost = sparkCost(inputTokens, outputTokens);
+  }
   modelCalls.push({
     flow: record.flow,
     step: record.step,
-    model: record.step === "read-document-retry" ? "muse-wonder-1.0" : "muse-spark-1.3",
+    model: record.model,
     inputTokens,
     outputTokens,
     estimatedCostUsd: cost,
@@ -70,7 +79,7 @@ function consumeServerOutput(chunk) {
   stdoutRemainder += chunk.toString("utf8");
   const lines = stdoutRemainder.split(/\r?\n/);
   stdoutRemainder = lines.pop() ?? "";
-  // Next startup output is discarded; only the app's token-only JSON usage
+  // Next startup output is discarded; only the app's content-free model usage
   // records are parsed and retained in memory.
   for (const line of lines) {
     if (!line.startsWith("{")) continue;
@@ -196,6 +205,46 @@ function makeSyntheticToneWav(seconds = 1) {
   return wav;
 }
 
+async function makeSyntheticSpeechWav(text) {
+  let tempDir;
+  try {
+    tempDir = await mkdtemp(join(tmpdir(), "asih-live-tts-"));
+    const mp3Path = join(tempDir, "speech.mp3");
+    const wavPath = join(tempDir, "speech.wav");
+    const ttsPython = [
+      "import sys",
+      "from gtts import gTTS",
+      "gTTS(sys.argv[2], lang='en').save(sys.argv[1])",
+    ].join("\n");
+    const tts = spawnSync(process.env.TTS_PYTHON || "python3", ["-c", ttsPython, mp3Path, text], {
+      encoding: "utf8",
+      timeout: 90_000,
+      maxBuffer: 2 * 1024 * 1024,
+      env: { PATH: process.env.PATH ?? "/usr/bin:/bin" },
+    });
+    if (tts.status !== 0) return null;
+
+    const conversion = spawnSync("ffmpeg", [
+      "-nostdin", "-v", "error", "-y", "-i", mp3Path,
+      "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", wavPath,
+    ], {
+      encoding: "utf8",
+      timeout: 15_000,
+      maxBuffer: 2 * 1024 * 1024,
+      env: { PATH: process.env.PATH ?? "/usr/bin:/bin" },
+    });
+    if (conversion.status !== 0) return null;
+
+    const wav = await readFile(wavPath);
+    if (wav.length <= 44) return null;
+    return { buffer: wav, seconds: Math.max(1, (wav.length - 44) / 32_000) };
+  } catch {
+    return null;
+  } finally {
+    if (tempDir) await rm(tempDir, { recursive: true, force: true });
+  }
+}
+
 function ensure(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -281,9 +330,17 @@ async function runFlow(name, requestFn, validateFn, excerptFn) {
       excerpt = "";
     }
     const validationNote = validateFn(data);
-    passed = true;
-    if (typeof validationNote === "string" && validationNote) notes.push(validationNote);
-    notes.push("HTTP flow completed and app guard behavior was verified.");
+    if (validationNote === "guard blocked") {
+      notes.push("guard blocked");
+      const guard = Array.isArray(data?.trace)
+        ? data.trace.find((step) => step?.tool === "output_guard")
+        : undefined;
+      if (typeof guard?.summary === "string") notes.push(`guard reason: ${guard.summary}`);
+    } else {
+      passed = true;
+      if (typeof validationNote === "string" && validationNote) notes.push(validationNote);
+      notes.push("HTTP flow completed and app guard behavior was verified.");
+    }
   } catch (error) {
     await settleUsageLogs();
     notes.push(error instanceof Error && error.message.startsWith("HTTP ")
@@ -344,6 +401,7 @@ async function writeResults() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   reportPath = resolve(resultDir, `${timestamp}.json`);
   const report = {
+    selectedFlows: activeFlowNames,
     flows: flowResults,
     totals: reportTotals(),
   };
@@ -355,7 +413,8 @@ function printSummary() {
     const tokens = flow.tokenCounts
       ? `in=${flow.tokenCounts.input} out=${flow.tokenCounts.output}`
       : "tokens unavailable";
-    console.log(`${flow.pass ? "PASS" : "FAIL"} ${flow.name}: ${flow.notes.join("; ")} | models=${flow.models.join(",") || "none"} | ${tokens} | $${flow.estimatedCostUsd.toFixed(6)}`);
+    const excerpt = flow.outputExcerpt ? ` | excerpt=${flow.outputExcerpt}` : "";
+    console.log(`${flow.pass ? "PASS" : "FAIL"} ${flow.name}: ${flow.notes.join("; ")} | models=${flow.models.join(",") || "none"} | ${tokens} | $${flow.estimatedCostUsd.toFixed(6)}${excerpt}`);
   }
   const totals = reportTotals();
   console.log(`Totals: ${totals.calls} model calls, ${totals.tokenCounts.input + totals.tokenCounts.output} tokens, estimated $${totals.estimatedCostUsd.toFixed(6)}.`);
@@ -369,10 +428,16 @@ const flowNames = [
   "group_invite_generation",
   "synthetic_audio_transcription",
 ];
+const selectedFlowNames = process.env.LIVE_FLOWS
+  ? new Set(process.env.LIVE_FLOWS.split(",").map((name) => name.trim()).filter(Boolean))
+  : null;
+const activeFlowNames = selectedFlowNames
+  ? flowNames.filter((name) => selectedFlowNames.has(name))
+  : flowNames;
 
 try {
   if (!process.env.META_API_KEY) {
-    for (const name of flowNames) addNotRunFlow(name, "LIVE=1 requires META_API_KEY; no calls were made.");
+    for (const name of activeFlowNames) addNotRunFlow(name, "LIVE=1 requires META_API_KEY; no calls were made.");
   } else {
     const port = await freePort();
     const baseUrl = `http://127.0.0.1:${port}`;
@@ -381,7 +446,7 @@ try {
     server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(port)], {
       cwd: projectRoot,
       env: childEnv,
-      // Capture only stdout so token-only usage records can be parsed. Never
+      // Capture only stdout so content-free usage records can be parsed. Never
       // forward server output, stderr, request headers, or environment values.
       stdio: ["ignore", "pipe", "ignore"],
     });
@@ -393,13 +458,15 @@ try {
       const modeResponse = await fetch(`${baseUrl}/api/mode`, { signal: AbortSignal.timeout(10_000) });
       const mode = modeResponse.ok ? await modeResponse.json() : null;
       if (!modeResponse.ok || mode?.mock !== false) {
-        for (const name of flowNames) addNotRunFlow(name, "Mode check failed: server did not report live mode; no flow calls were made.");
+        for (const name of activeFlowNames) addNotRunFlow(name, "Mode check failed: server did not report live mode; no flow calls were made.");
       } else {
         let imageDataUrl = "";
-        try {
-          imageDataUrl = makeSyntheticLetterPng();
-        } catch {
-          addNotRunFlow(flowNames[0], "Synthetic PNG generation failed; image flow was not called.");
+        if (activeFlowNames.includes(flowNames[0])) {
+          try {
+            imageDataUrl = makeSyntheticLetterPng();
+          } catch {
+            addNotRunFlow(flowNames[0], "Synthetic PNG generation failed; image flow was not called.");
+          }
         }
 
         if (imageDataUrl) {
@@ -427,16 +494,21 @@ try {
               const guardPassed = outputGuardPassed(data);
               assertNoUnsafeText(JSON.stringify(data.result.fields), "User-facing appointment fields");
               if (guardPassed) assertNoUnsafeText(appAssistantText(data), "Guard-approved assistant text");
-              return guardPassed ? "" : "Output guard blocked the model reply; only structured appointment fields were returned.";
+              return guardPassed ? "" : "guard blocked";
             },
-            (data) => `Appointment fields: ${data.result.fields.map((field) => `${field.kind}=${field.readable ? "readable" : "unreadable"}`).join(", ")}`,
+            (data) => `Appointment fields: ${JSON.stringify(data.result.fields.map((field) => ({
+              kind: field.kind,
+              value: field.value,
+              readable: field.readable,
+            })))}`,
           );
         }
 
         if (budgetExceeded) {
-          for (const name of flowNames.slice(flowResults.length)) addNotRunFlow(name, "Stopped after the estimated $2 spend threshold.");
+          for (const name of activeFlowNames.slice(flowResults.length)) addNotRunFlow(name, "Stopped after the estimated $2 spend threshold.");
         } else {
           for (const [lang, name] of [["en", "scam_ad_en"], ["es", "scam_ad_es"]]) {
+            if (!activeFlowNames.includes(name)) continue;
             await runFlow(
               name,
               () => requestJson(`${baseUrl}/api/agent`, {
@@ -466,16 +538,16 @@ try {
                   [data.result.message, data.result.explanation?.steps, data.result.draft?.draft].flat().join(" "),
                   "User-facing ad-check output",
                 );
-                return guardPassed ? "" : "Output guard blocked the model reply and returned fixed scam wording.";
+                return guardPassed ? "" : "guard blocked";
               },
-              (data) => data.result.message,
+              (data) => `Message: ${data.result.message}`,
             );
             if (budgetExceeded) break;
           }
 
           if (budgetExceeded) {
-            for (const name of flowNames.slice(flowResults.length)) addNotRunFlow(name, "Stopped after the estimated $2 spend threshold.");
-          } else {
+            for (const name of activeFlowNames.slice(flowResults.length)) addNotRunFlow(name, "Stopped after the estimated $2 spend threshold.");
+          } else if (activeFlowNames.includes(flowNames[3])) {
             await runFlow(
               "group_invite_generation",
               () => requestJson(`${baseUrl}/api/agent`, {
@@ -493,65 +565,63 @@ try {
                 const guardPassed = outputGuardPassed(data);
                 assertNoUnsafeText(JSON.stringify(data.result), "User-facing group invite output");
                 if (guardPassed) assertNoUnsafeText(appAssistantText(data), "Guard-approved assistant text");
-                return guardPassed ? "" : "Output guard blocked the model reply; only structured group-planning data and the editable invite were returned.";
+                return guardPassed ? "" : "guard blocked";
               },
-              (data) => data.result.invite.draft,
+              (data) => JSON.stringify({
+                event: data.result.event,
+                plan: data.result.plan,
+                invite: data.result.invite,
+              }),
             );
+          }
 
-            if (budgetExceeded) {
-              for (const name of flowNames.slice(flowResults.length)) addNotRunFlow(name, "Stopped after the estimated $2 spend threshold.");
-            } else {
-              const audioStartIndex = modelCalls.length;
-              const audioSeconds = 1;
-              const audio = makeSyntheticToneWav(audioSeconds);
-              const form = new FormData();
-              form.append("audio", new Blob([audio], { type: "audio/wav" }), "synthetic-tone.wav");
-              form.append("lang", "en");
-              const notes = ["Used a one-second synthetic tone because no TTS binary was available."];
-              let passed = false;
-              let excerpt = "";
-              try {
-                const response = await fetch(`${baseUrl}/api/transcribe`, {
-                  method: "POST",
-                  body: form,
-                  signal: AbortSignal.timeout(timeoutMs),
-                });
-                const payload = response.ok ? await response.json() : null;
-                if (!response.ok) {
-                  await response.arrayBuffer();
-                  throw new Error(`HTTP ${response.status}`);
-                }
-                ensure(payload?.mock === false, "App returned mock transcription in live mode");
-                ensure(typeof payload?.transcript === "string", "App returned no transcript string");
-                passed = true;
-                excerpt = `Transcript response received (${payload.transcript.length} characters).`;
-                // The ASR endpoint does not return token counts. Track one model
-                // call and estimate by the app's $0.18/hour voice rate.
-                modelCalls.push({
-                  flow: "transcribe",
-                  step: "audio-transcription",
-                  model: "muse-voice-transcribe-1.0",
-                  inputTokens: null,
-                  outputTokens: null,
-                  estimatedCostUsd: audioSeconds / 3600 * 0.18,
-                });
-                totalEstimatedCostUsd += audioSeconds / 3600 * 0.18;
-              } catch (error) {
-                notes.push(error instanceof Error && error.message.startsWith("HTTP ")
-                  ? error.message
-                  : error instanceof Error && error.message.startsWith("App ")
-                    ? error.message
-                    : "Request or output assertion failed.");
+          if (budgetExceeded) {
+            for (const name of activeFlowNames.slice(flowResults.length)) addNotRunFlow(name, "Stopped after the estimated $2 spend threshold.");
+          } else if (activeFlowNames.includes(flowNames[4])) {
+            const audioStartIndex = modelCalls.length;
+            const spokenText = "This is an example voice note. Please call me back tomorrow.";
+            const synthesized = await makeSyntheticSpeechWav(spokenText);
+            const audioSeconds = synthesized?.seconds ?? 1;
+            const audio = synthesized?.buffer ?? makeSyntheticToneWav(audioSeconds);
+            const form = new FormData();
+            form.append("audio", new Blob([audio], { type: "audio/wav" }), synthesized ? "synthetic-speech.wav" : "synthetic-tone.wav");
+            form.append("lang", "en");
+            const notes = synthesized
+              ? ["Used a synthetic spoken English sentence."]
+              : ["TTS was unavailable; used a one-second synthetic tone."];
+            let passed = false;
+            let excerpt = "";
+            try {
+              const response = await fetch(`${baseUrl}/api/transcribe`, {
+                method: "POST",
+                body: form,
+                signal: AbortSignal.timeout(timeoutMs),
+              });
+              const payload = response.ok ? await response.json() : null;
+              excerpt = `Transcript: ${shortExcerpt(payload?.transcript)}`;
+              if (!response.ok) {
+                await response.arrayBuffer();
+                throw new Error(`HTTP ${response.status}`);
               }
-              await settleUsageLogs();
-              if (passed) notes.push("Live transcription route returned a string response.");
-              summarizeFlow(flowNames[4], audioStartIndex, passed, notes, excerpt);
+              ensure(payload?.mock === false, "App returned mock transcription in live mode");
+              ensure(typeof payload?.transcript === "string", "App returned no transcript string");
+              if (synthesized) ensure(payload.transcript.trim().length > 10, "App returned an empty speech transcript");
+              passed = true;
+            } catch (error) {
+              notes.push(error instanceof Error && error.message.startsWith("HTTP ")
+                ? error.message
+                : error instanceof Error && error.message.startsWith("App ")
+                  ? error.message
+                  : "Request or output assertion failed.");
             }
+            await settleUsageLogs();
+            if (passed) notes.push("Live transcription route returned a string response.");
+            summarizeFlow(flowNames[4], audioStartIndex, passed, notes, excerpt);
           }
         }
       }
     } catch {
-      for (const name of flowNames.slice(flowResults.length)) {
+      for (const name of activeFlowNames.slice(flowResults.length)) {
         addNotRunFlow(name, budgetExceeded
           ? "Stopped after the estimated $2 spend threshold."
           : "Server startup or live-mode verification failed; no further flow calls were made.");
@@ -559,7 +629,7 @@ try {
     }
   }
 } catch {
-  for (const name of flowNames.slice(flowResults.length)) {
+  for (const name of activeFlowNames.slice(flowResults.length)) {
     addNotRunFlow(name, "Live e2e setup failed before the flow could run.");
   }
 } finally {

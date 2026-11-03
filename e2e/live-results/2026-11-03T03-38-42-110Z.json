@@ -1,0 +1,100 @@
+{
+  "flows": [
+    {
+      "name": "chat_intent_and_appointment_text_plus_image",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 75083,
+        "output": 4160
+      },
+      "estimatedCostUsd": 0.11153375,
+      "outputExcerpt": "Appointment fields: [{\"kind\":\"date\",\"value\":\"Tuesday, December 1, 2026\",\"readable\":true},{\"kind\":\"time\",\"value\":\"10:30 AM\",\"readable\":true},{\"kind\":\"place\",\"value\":\"10 Example Road, Riverton\",\"readable\":true},{\"kind\":\"c…"
+    },
+    {
+      "name": "scam_ad_en",
+      "pass": false,
+      "notes": [
+        "guard blocked",
+        "guard reason: Blocked: cure-claim."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 3878,
+        "output": 2779
+      },
+      "estimatedCostUsd": 0.01665825,
+      "outputExcerpt": "Message: I can see these warning signs. I can't tell whether this is real or whether the product works. Check with someone you trust before paying or sharing details."
+    },
+    {
+      "name": "scam_ad_es",
+      "pass": false,
+      "notes": [
+        "guard blocked",
+        "guard reason: Blocked: cure-claim."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 3629,
+        "output": 1955
+      },
+      "estimatedCostUsd": 0.012845,
+      "outputExcerpt": "Message: Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de su confianza antes de pagar o compartir datos."
+    },
+    {
+      "name": "group_invite_generation",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 3191,
+        "output": 2492
+      },
+      "estimatedCostUsd": 0.01457975,
+      "outputExcerpt": "{\"event\":null,\"plan\":null,\"invite\":{\"draft\":\"Hello Jane Example. Would you like to join me at Example Community Walking Group on Saturday, November 7, 2026 at 9:00 AM? We meet at Riverton. Let me know.\",\"whatsappUrl\":\"h…"
+    },
+    {
+      "name": "synthetic_audio_transcription",
+      "pass": true,
+      "notes": [
+        "TTS was unavailable; used a one-second synthetic tone.",
+        "Live transcription route returned a string response."
+      ],
+      "models": [
+        "muse-voice-transcribe-1.0"
+      ],
+      "tokenCounts": null,
+      "estimatedCostUsd": 0.00005,
+      "outputExcerpt": "Transcript:"
+    }
+  ],
+  "totals": {
+    "calls": 13,
+    "tokenCounts": {
+      "input": 85781,
+      "output": 11386
+    },
+    "estimatedCostUsd": 0.15566675
+  }
+}
