@@ -46,4 +46,10 @@ describe("output guard rules", () => {
     expect(res.pass).toBe(true);
     expect(res.liveChecked).toBe(false);
   });
+
+  it("states AI limits and returns the choice to the person in the fixed reply", () => {
+    expect(FIXED_SAFE_REPLY).toContain("not a doctor");
+    expect(FIXED_SAFE_REPLY).toContain("You decide what to do next");
+    expect(FIXED_SAFE_REPLY).not.toMatch(/[!¡]/);
+  });
 });

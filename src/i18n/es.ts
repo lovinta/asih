@@ -17,8 +17,8 @@ export const es: Strings = {
     "unusual-url": "Dirección web inusual",
   },
   appTitle: "Asih",
-  // TODO: Spanish needs fluent-speaker check; "una asistente" vs "un asistente" is a choice to confirm.
-  intro: "Hola, soy Asih, una asistente de inteligencia artificial. No soy una persona ni un médico. Usted decide cada paso.",
+  // TODO: Spanish needs fluent-speaker check. Using "un programa" avoids a gendered "asistente".
+  intro: "Hola, soy Asih, un programa de inteligencia artificial. No soy una persona ni un médico. Puedo cometer errores. Usted decide cada paso.",
   dataNoticeLeadIn: "Antes de compartir algo, le explico qué pasa con eso.",
   avatarAlt: "Asih (asistente de IA)",
   common: {
@@ -29,7 +29,7 @@ export const es: Strings = {
     savedOnPhone: "Guardado en este teléfono.",
   },
   home: {
-    subtitle: "Cuatro tipos de ayuda. Sin chat. Usted decide cada paso.",
+    subtitle: "Varios tipos de ayuda. Sin chat abierto. Usted decide cada paso.",
     appointmentLetter: "Carta de cita",
     findGroup: "Buscar un grupo",
     checkAd: "Revisar un anuncio",
@@ -48,7 +48,7 @@ export const es: Strings = {
   resume: "Continuar",
   speechRate: "Velocidad de voz",
   back: "Atrás",
-  loading: "Estamos trabajando.",
+  loading: "Estoy trabajando. Esto puede tomar un momento.",
   getHelpButton: "Obtener ayuda — no es consejo médico",
   deleteEverything: "Borrar todo",
   dataNotice: {
@@ -65,7 +65,7 @@ export const es: Strings = {
     neverCalls: "La aplicación nunca llama por sí sola.",
   },
   confirm: {
-    title: "Leí esto. ¿Es correcto?",
+    title: "¿Es correcto este dato?",
     confirmButton: "Confirmar",
     changeButton: "Cambiar",
     editLabel: "Valor correcto",
@@ -132,21 +132,22 @@ export const es: Strings = {
     sharedSource: "Anuncio compartido por la persona",
     calendarTypes: ["Biblioteca pública", "Centro de personas mayores", "Departamento de parques"],
     inviteTemplate:
-      "Hola{names}. ¿Le gustaría acompañarme a {event} el {date} a las {time}? Nos reunimos en {place}. Avíseme.",
+      "Hola{names}. Le invito al grupo {event}. Fecha: {date}. Hora: {time}. Lugar: {place}. Avíseme si le gustaría venir.",
     meetTipsTitle: "Conocer gente nueva",
     meetTips: "Reúnase en un lugar público. Avise a una persona de confianza. Puede irse en cualquier momento.",
     whatsappGroupNote:
       "Para crear un grupo de WhatsApp: abra WhatsApp, toque Nuevo grupo, agregue a las personas que elija y envíe su invitación.",
   },
   flowC: {
-    adIntro: "Esto es lo que veo en este anuncio.",
-    title: "Revisión de anuncios y estafas de salud",
+    adIntro: "Esto es lo que puedo y no puedo decirle.",
+    title: "Revisar un anuncio",
+    checkButton: "Revisar este anuncio",
     shareAdHint: "Comparta una captura del anuncio o pegue el texto del anuncio.",
     adTextLabel: "O pegue aquí el texto del anuncio",
     adTextPlaceholder: "Pegue aquí el texto del anuncio",
     uploadScreenshot: "Subir una captura del anuncio",
     useExampleAd: "Usar anuncio de ejemplo",
-    importantTitle: "Por favor lea esto",
+    importantTitle: "Importante",
     notePlaceholder: "Escriba su nota aquí. Puede editarla hasta que la envíe.",
     cuesTitle: "Señales de advertencia que puedo ver",
     whyAdTitle: "¿Por qué veo este anuncio?",
@@ -156,7 +157,7 @@ export const es: Strings = {
     draftTemplate:
       "¿Puede mirar este anuncio conmigo? Es de {advertiser}. Quiero una segunda opinión antes de pagar o compartir datos.",
     whyStep1:
-      "Toque los tres puntos del anuncio y luego toque «Por qué veo este anuncio» para ver lo que el anunciante eligió.",
+      "Toque los tres puntos del anuncio. Luego toque «Por qué veo este anuncio». Esto muestra lo que el anunciante eligió.",
     whyStep2: "Revise sus preferencias de anuncios en el Centro de cuentas.",
     whyStep4: "Busque al anunciante en la Biblioteca de anuncios de Meta.",
     prefsLink: "Abrir las preferencias de anuncios en el Centro de cuentas",
@@ -165,14 +166,14 @@ export const es: Strings = {
     openWhatsapp: "Abrir en WhatsApp",
     shareButton: "Compartir",
     reportHint:
-      "Para denunciar un anuncio: toque los tres puntos del anuncio y luego toque Denunciar anuncio.",
+      "Para denunciar un anuncio, toque los tres puntos. Luego toque Denunciar anuncio.",
   },
   safety: {
     scamWithCues:
       "Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de su confianza antes de pagar o compartir datos.",
     noCuesSuffix: "Eso no significa que sea seguro.",
     fixedSafeReply:
-      "No puedo ayudar con eso. Si necesita ayuda ahora, use el botón Obtener ayuda. También puede hablar con alguien de su confianza.",
+      "No puedo ayudar con eso. Soy un programa de inteligencia artificial, no un médico. Para ayuda ahora, use el botón Obtener ayuda o hable con alguien de su confianza. Usted decide qué hacer.",
     whatsappCue:
       "Pasar a WhatsApp cuenta como señal de advertencia cuando se pide antes de que pueda comprobar quiénes son.",
   },
@@ -191,9 +192,9 @@ export const es: Strings = {
     decodeError: "No pude leer ese archivo de audio. Pruebe con otro archivo de audio.",
     micError: "No pude iniciar el micrófono. Revise el acceso al micrófono e inténtelo de nuevo.",
     transcribeError: "No pude transcribir esa nota de voz. Inténtelo de nuevo.",
-    phoneAd: "Para revisar un anuncio, use Revisión de anuncios y estafas de salud con una foto o el texto del anuncio.",
-    unknown: "Puedo ayudarle con visitas, grupos y anuncios.",
-    openAdCheck: "Abrir Revisión de anuncios y estafas de salud",
+    phoneAd: "No puedo comprobar quién está detrás de un anuncio. Para revisar el anuncio, abra Revisar un anuncio y agregue una foto o el texto del anuncio.",
+    unknown: "No puedo tener una conversación abierta. Puedo ayudarle con visitas, grupos y anuncios. ¿Cuál prefiere?",
+    openAdCheck: "Revisar un anuncio",
     openAppointment: "Ayuda con citas",
     openGroups: "Encontrar un grupo",
     openWhatsapp: "Abrir en WhatsApp",

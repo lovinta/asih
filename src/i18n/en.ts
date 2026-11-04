@@ -6,14 +6,14 @@ export const en = {
     person_name: "Who you will see", phone: "Phone", bring_items: "What to bring",
   },
   cueKinds: {
-    urgency: "Hurry pressure", "too-good-claim": "Promise that sounds too good",
+    urgency: "Pressure to act quickly", "too-good-claim": "Promise that sounds too good",
     "celebrity-endorsement": "Famous person endorsement",
     "move-to-private-chat": "Asks you to move to a private chat",
     "payment-risk": "Requests risky payment", "asks-personal-details": "Asks for personal or bank details",
     "unusual-url": "Unusual web address",
   },
   appTitle: "Asih",
-  intro: "Hello, I'm Asih, an AI helper. I'm not a person and not a doctor. You decide every step.",
+  intro: "Hello, I'm Asih, an AI helper. I'm not a person or a doctor. I can make mistakes. You decide every step.",
   dataNoticeLeadIn: "Before you share anything, here is what happens to it.",
   avatarAlt: "Asih (AI helper)",
   common: {
@@ -24,7 +24,7 @@ export const en = {
     savedOnPhone: "Saved on this phone.",
   },
   home: {
-    subtitle: "Four kinds of help. No chat. You decide each step.",
+    subtitle: "A few kinds of help. No open chat. You decide each step.",
     appointmentLetter: "Appointment letter",
     findGroup: "Find a group",
     checkAd: "Check an ad",
@@ -43,7 +43,7 @@ export const en = {
   resume: "Resume",
   speechRate: "Speech rate",
   back: "Back",
-  loading: "Working on it.",
+  loading: "Working on it. This can take a moment.",
   getHelpButton: "Get help — not medical advice",
   deleteEverything: "Delete everything",
   dataNotice: {
@@ -60,7 +60,7 @@ export const en = {
     neverCalls: "The app never calls by itself.",
   },
   confirm: {
-    title: "I read this. Is it right?",
+    title: "Is this information right?",
     confirmButton: "Confirm",
     changeButton: "Change",
     editLabel: "Correct value",
@@ -134,14 +134,15 @@ export const en = {
       "To make a WhatsApp group: open WhatsApp, tap New group, add the people you choose, and send your invitation.",
   },
   flowC: {
-    adIntro: "Here is what I can see in this ad.",
-    title: "Health-scam and ad check",
+    adIntro: "Here is what I can and cannot tell you.",
+    title: "Check an ad",
+    checkButton: "Check this ad",
     shareAdHint: "Share an ad screenshot or paste the ad text.",
     adTextLabel: "Or paste the ad text here",
     adTextPlaceholder: "Paste the ad text here",
     uploadScreenshot: "Upload an ad screenshot",
     useExampleAd: "Use example ad",
-    importantTitle: "Please read this",
+    importantTitle: "Important",
     notePlaceholder: "Write your note here. It stays editable until you send it.",
     cuesTitle: "Warning signs I can see",
     whyAdTitle: "Why am I seeing this ad?",
@@ -151,7 +152,7 @@ export const en = {
     draftTemplate:
       "Can you look at this ad with me? It is from {advertiser}. I want a second opinion before I pay or share any details.",
     whyStep1:
-      "Tap the three dots on the ad, then tap 'Why am I seeing this ad?' to see what the advertiser targeted.",
+      "Tap the three dots on the ad. Then tap 'Why am I seeing this ad?' This shows what the advertiser targeted.",
     whyStep2: "Check your ad preferences in Accounts Center.",
     whyStep4: "Look the advertiser up in the Meta Ad Library.",
     prefsLink: "Open ad preferences in Accounts Center",
@@ -160,14 +161,14 @@ export const en = {
     openWhatsapp: "Open in WhatsApp",
     shareButton: "Share",
     reportHint:
-      "To report an ad: tap the three dots on the ad, then tap Report ad.",
+      "To report an ad, tap the three dots. Then tap Report ad.",
   },
   safety: {
     scamWithCues:
       "I can see these warning signs. I can't tell whether this is real or whether the product works. Check with someone you trust before paying or sharing details.",
     noCuesSuffix: "That doesn't mean it's safe.",
     fixedSafeReply:
-      "I can't help with that. If you need help right now, use the Get help button. You can also talk to someone you trust.",
+      "I can't help with that. I'm an AI helper, not a doctor. For help right now, use the Get help button or talk with someone you trust. You decide what to do next.",
     whatsappCue:
       "Moving to WhatsApp counts as a warning sign when it is asked before you can check who they are.",
   },
@@ -185,9 +186,9 @@ export const en = {
     decodeError: "I could not read that audio file. Try another audio file.",
     micError: "I could not start the microphone. Check microphone access and try again.",
     transcribeError: "I could not transcribe that voice note. Please try again.",
-    phoneAd: "To check an ad, use Health-scam and ad check with a photo or the ad text.",
-    unknown: "I can help with visits, groups and ads.",
-    openAdCheck: "Open Health-scam and ad check",
+    phoneAd: "I can't check who is behind an ad. To check the ad, open Check an ad and add a photo or the ad text.",
+    unknown: "I can't have an open conversation. I can help with visits, groups, and ads. Which one would you like?",
+    openAdCheck: "Check an ad",
     openAppointment: "Appointment help",
     openGroups: "Find a group",
     openWhatsapp: "Open in WhatsApp",

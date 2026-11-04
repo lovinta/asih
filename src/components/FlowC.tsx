@@ -172,7 +172,7 @@ export default function FlowC({ lang, needGate, openHelp }: FlowProps) {
           </label>
           <div className="button-row">
             <button type="button" className="primary" onClick={submitText}>
-              {t.flowC.title}
+              {t.flowC.checkButton}
             </button>
             <button type="button" data-testid="flow-c-example" onClick={useExample}>
               {t.flowC.useExampleAd}

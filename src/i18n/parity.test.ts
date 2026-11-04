@@ -28,6 +28,13 @@ describe("i18n key parity", () => {
     walk(es);
   });
 
+  it("uses a distinct Flow C submit label in both languages", () => {
+    expect(en.flowC.checkButton).toBe("Check this ad");
+    expect(es.flowC.checkButton).toBe("Revisar este anuncio");
+    expect(en.flowC.checkButton).not.toBe(en.flowC.title);
+    expect(es.flowC.checkButton).not.toBe(es.flowC.title);
+  });
+
   it("labels every letter field and scam cue kind in both languages", () => {
     for (const kind of LETTER_KINDS) {
       expect(en.fieldKinds[kind]).toBeTruthy();
@@ -68,5 +75,28 @@ describe("i18n key parity", () => {
     expect(instructions).toContain("short, plain sentences");
     expect(instructions).toContain("pet names or exclamation marks");
     expect(instructions).toContain("formal usted");
+    // Non-patronizing, honest, autonomy-supportive rules from the round-one guidelines.
+    expect(instructions).toContain("You can make mistakes");
+    expect(instructions).toContain("baby talk");
+    expect(instructions).toContain("one idea at a time");
+    expect(instructions).toContain("Never rush the person");
+    expect(instructions).toContain("let the person decide every step");
+  });
+
+  it("keeps honesty, fallibility, and choice in the opening and fallback copy", () => {
+    expect(en.intro).toContain("AI helper");
+    expect(en.intro).toContain("not a person or a doctor");
+    expect(en.intro).toContain("I can make mistakes");
+    expect(es.intro).toContain("programa de inteligencia artificial");
+    expect(es.intro).toContain("Puedo cometer errores");
+    expect(en.safety.fixedSafeReply).toContain("not a doctor");
+    expect(en.safety.fixedSafeReply).toContain("You decide what to do next");
+    expect(es.safety.fixedSafeReply).toContain("no un médico");
+    expect(es.safety.fixedSafeReply).toContain("Usted decide");
+    expect(en.voice.unknown).toContain("can't have an open conversation");
+    expect(en.voice.unknown).toContain("Which one would you like?");
+    expect(es.voice.unknown).toContain("No puedo tener una conversación abierta");
+    expect(en.voice.phoneAd).toContain("can't check who is behind an ad");
+    expect(es.voice.phoneAd).toContain("No puedo comprobar quién está detrás");
   });
 });

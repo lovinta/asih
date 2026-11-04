@@ -3,7 +3,7 @@
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import { runFlow, fillArgs, resolveFlowCMessage, type Ctx } from "./runFlow";
 import type { FlowCResult, FlowAResult, FlowBResult } from "./runFlow";
-import { executeTool } from "./tools";
+import { executeTool, findScamCues } from "./tools";
 import {
   FIXED_SCAM_WORDING_EN,
   FIXED_SCAM_WORDING_ES,
@@ -90,7 +90,26 @@ describe("Flow B (find a group)", () => {
     expect(plan.rideNote).toBe(esStrings.flowB.rideNote);
     expect(plan.meetTips).toBe(esStrings.flowB.meetTips);
     const invite = b.invite as { draft: string };
-    expect(invite.draft).toContain("acompañarme");
+    expect(invite.draft).toContain("Le invito al grupo");
+    expect(invite.draft).toContain("Avíseme si le gustaría venir");
+  });
+
+  it("renders Spanish invitation names right after Hola", async () => {
+    const invite = (await executeTool(
+      "draft_invite",
+      {
+        eventName: "Riverside Morning Walkers",
+        date: "Saturday, November 7, 2026",
+        time: "9:00 AM",
+        place: "Riverside Park main gate",
+        names: ["Ana", "Luis"],
+      },
+      "es",
+    )) as { draft: string };
+    expect(invite.draft).toContain(
+      "Hola Ana, Luis. Le invito al grupo Riverside Morning Walkers.",
+    );
+    expect(invite.draft).not.toContain("{names}");
   });
 });
 
@@ -128,6 +147,68 @@ describe("Flow C (ad check)", () => {
     const c = result as FlowCResult;
     expect(c.message).toContain(FIXED_SCAM_WORDING_EN);
     expect(c.message).not.toMatch(/this is safe/i);
+  });
+
+  it("does not invent an advertiser for a pasted ad in mock mode", async () => {
+    const { result } = await runFlow(
+      "C",
+      {
+        sharedText:
+          "Only 2 left. Message us on WhatsApp. Guaranteed to cure arthritis. Send your bank details.",
+      },
+      "en",
+    );
+    const c = result as FlowCResult;
+    expect(c.message).toContain(FIXED_SCAM_WORDING_EN);
+    expect(c.cues.map((cue) => cue.cue)).toEqual(
+      expect.arrayContaining(["urgency", "too-good-claim", "move-to-private-chat", "asks-personal-details"]),
+    );
+    // A one-paragraph ad must quote the sentence, not repeat the whole paragraph.
+    const evidence = Object.fromEntries(c.cues.map((cue) => [cue.cue, cue.evidence]));
+    expect(evidence.urgency).toBe("Only 2 left.");
+    expect(evidence["too-good-claim"]).toBe("Guaranteed to cure arthritis.");
+    expect(evidence["move-to-private-chat"]).toBe("Message us on WhatsApp.");
+    expect(evidence["asks-personal-details"]).toBe(
+      "Send your bank details.",
+    );
+    const explanation = c.explanation as { advertiser: string };
+    const draft = c.draft as { draft: string };
+    expect(explanation.advertiser).toBe(enStrings.flowC.unknownAdvertiser);
+    expect(draft.draft).toContain(enStrings.flowC.unknownAdvertiser);
+    expect(draft.draft).not.toContain("EverFlex");
+  });
+
+  it("uses the example ad text fallback for a mock photo but keeps the advertiser unknown", async () => {
+    const { result } = await runFlow(
+      "C",
+      { imageDataUrl: "data:image/png;base64,AAAA" },
+      "en",
+    );
+    const c = result as FlowCResult;
+    expect(c.cues.length).toBeGreaterThan(0);
+    expect(c.message).toContain(FIXED_SCAM_WORDING_EN);
+    const explanation = c.explanation as { advertiser: string };
+    const draft = c.draft as { draft: string };
+    expect(explanation.advertiser).toBe(enStrings.flowC.unknownAdvertiser);
+    expect(draft.draft).not.toContain("EverFlex");
+  });
+
+  it("keeps abbreviations and decimals inside sentence evidence", () => {
+    const text =
+      "Dr. Smith says the special price is 9.99 dollars for this miracle tonic, and Mrs. Jones says it works. Only 2 left.";
+    const cues = findScamCues(text);
+    const evidence = Object.fromEntries(cues.map((cue) => [cue.cue, cue.evidence]));
+    expect(evidence["too-good-claim"]).toBe(
+      "Dr. Smith says the special price is 9.99 dollars for this miracle tonic, and Mrs. Jones says it works.",
+    );
+    expect(evidence.urgency).toBe("Only 2 left.");
+  });
+
+  it("returns the whole line when the text has no terminal punctuation", () => {
+    const text =
+      "This miracle tonic costs 9.99 dollars today and has no ending punctuation at all in this deliberately long line";
+    const cues = findScamCues(text);
+    expect(cues.find((cue) => cue.cue === "too-good-claim")?.evidence).toBe(text);
   });
 
   it("redirects to Get help on red-flag input instead of running the agent", async () => {

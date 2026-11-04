@@ -3,7 +3,7 @@
 // safe reply instead of the model text. Mock mode runs rules only.
 
 export const FIXED_SAFE_REPLY =
-  "I can't help with that. If you need help right now, use the Get help button. You can also talk to someone you trust.";
+  "I can't help with that. I'm an AI helper, not a doctor. For help right now, use the Get help button or talk with someone you trust. You decide what to do next.";
 
 export interface GuardResult {
   pass: boolean;

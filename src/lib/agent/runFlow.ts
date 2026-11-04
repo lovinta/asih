@@ -369,19 +369,31 @@ export async function runFlow(
     trace.push({ tool: "read_document", summary: "Letter fields extracted.", ok: true });
   }
   if (flow === "C") {
-    const adArgs =
-      input.useExample || (!input.imageDataUrl && !input.sharedText)
-        ? { example: true }
-        : input.imageDataUrl
-          ? { imageDataUrl: input.imageDataUrl }
-          : { adText: input.sharedText ?? "" };
+    const usingExample =
+      Boolean(input.useExample) || (!input.imageDataUrl && !input.sharedText);
+    const adArgs = usingExample
+      ? { example: true }
+      : input.imageDataUrl
+        ? { imageDataUrl: input.imageDataUrl }
+        : { adText: input.sharedText ?? "" };
     const ad = (await executeTool("read_ad", adArgs, lang)) as {
       text: string;
       advertiser: string;
     };
     if (isMockMode()) {
-      ctx.adText = ad.text || EXAMPLE_AD_TEXT;
-      ctx.advertiser = ad.advertiser !== "unknown" ? ad.advertiser : EXAMPLE_ADVERTISER;
+      // Never invent an advertiser for a pasted ad: the example advertiser
+      // belongs only to the synthetic example ad. A mock photo has no OCR, so
+      // fall back to the example ad text while leaving the advertiser unknown.
+      const mockTextFallback = input.imageDataUrl
+        ? EXAMPLE_AD_TEXT
+        : (input.sharedText ?? "");
+      ctx.adText = ad.text || (usingExample ? EXAMPLE_AD_TEXT : mockTextFallback);
+      ctx.advertiser =
+        ad.advertiser !== "unknown"
+          ? ad.advertiser
+          : usingExample
+            ? EXAMPLE_ADVERTISER
+            : "unknown";
     } else {
       ctx.adText = ad.text || input.sharedText || "";
       ctx.advertiser = ad.advertiser || "unknown";
