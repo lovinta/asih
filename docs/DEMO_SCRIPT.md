@@ -1,45 +1,88 @@
-# Demo script (3:00 maximum)
+# Demo script (target 2:15–2:50, hard stop 3:00)
 
-**Length.** No official source we could read states a video length (see [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md), Notes). The plan Page set 3 minutes, so this script runs 3:00 or less. If the submit form or Discord gives a different limit, cut from the bottom of the "Cut order" list.
+No official source we could read states a video length (see
+[SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md), Notes). The plan Page assumed
+3 minutes, so this script stays under 3:00. The recorded cut targets **2:28**.
+If the submit form or Discord gives a different limit, cut from the bottom of
+the "Cut order" list.
 
-**Rules for the recording.**
-- Synthetic data only. Every example screen shows **EXAMPLE (synthetic data)**.
-- Asih is an AI, not a person or doctor. No medical advice on screen or in narration.
-- The data notice and the fixed scam wording are shown verbatim; do not paraphrase them in narration.
-- The person sends every message herself. Never show the app sending, calling or booking anything.
-- No driving scene.
-- Mock mode shows the "Offline demo mode" banner. A live recording needs Vinta's API key and credits first. Never present mock results as live model quality.
-- Narration: Vinta's voice or captions plus the app's read-aloud voice (Vinta decides). About 130 words per minute; each scene's narration fits its time.
+This script was checked against the current UI (`src/components`, `src/i18n`,
+`src/fixtures`, `wear/screenshots`) on **November 4, 2026**. The earlier draft
+said "I read this. Is it right?"; the UI now says **"Is this information
+right?"**. The old draft also included a voice-note scene that is not in the
+6-clip recorded cut; voice notes remain a backup scene below.
 
-## Scenes
+## Rules for the recording
 
-| Time | Scene (one synthetic older adult's week) | On screen (verified UI text) | Narration (draft) |
+- Synthetic data only. Every example screen shows **EXAMPLE (synthetic data)**
+  (Spanish: **EJEMPLO (datos sintéticos)**).
+- Asih is an AI, not a person or doctor. No medical advice on screen or in
+  narration.
+- Show the data notice and the fixed scam wording verbatim; do not paraphrase
+  them in narration.
+- The person sends every message herself. Never show the app sending, calling,
+  or booking anything.
+- Mock mode shows the "Offline demo mode: example data, no AI calls." banner.
+  A live recording needs the API key and credits. Never present mock results as
+  live model quality.
+- Narration: calm English captions plus spoken lines. About 130–150 words per
+  minute; each scene's narration fits its time.
+
+## Recorded scenes (6 clips + title/end cards)
+
+| Time | Clip | On screen (verified current UI) | Narration (recorded lines) |
 | --- | --- | --- | --- |
-| 0:00–0:15 | Meet her: 72, lives alone, weak eyesight, family on WhatsApp. | Home: Asih mark, "Hello, I'm Asih, an AI helper. I'm not a person and not a doctor. You decide every step." Large text, EN/ES. | "She's seventy-two, lives alone, and her eyes are not what they were. Asih is an AI helper, not a chatbot. She decides every step." |
-| 0:15–0:25 | First share: the data notice is read aloud. | "Before you share" notice, **Read aloud**, then "I understand". | (Let the app's voice read the first line of the notice; no narration over it.) |
-| 0:25–1:00 | **Monday, find a group (core 1).** She pastes a walking-group listing. | **Find a group** → "Use example listing" → confirm when and where, one at a time → "Plan for showing up" (checklist, calendar file, "You arrange the ride. This app never books rides.") → "Invite a small group": she types two neighbors' names → "Open in WhatsApp". | "She wants to meet people. Asih reads the listing, and she confirms the day, time and place herself. Then a plan to show up, and an invitation she writes and sends herself on WhatsApp." |
-| 1:00–1:40 | **Tuesday, appointment letter (core 2).** A hard-to-read letter. | **Appointment letter** → "Use example letter" → "I read this. Is it right?": items in large text, one at a time; she taps **Change** on one and corrects it, then **Confirm** → "Visit saved on this phone." → "Download calendar file (.ics)"; she adds her own question. | "A letter she can't read well. Asih reads it out and shows each detail large. One is wrong, so she changes it. Nothing is saved until she confirms." |
-| 1:40–2:10 | **Thursday, a suspicious ad (core 3).** | **Check an ad** → "Use example ad" → "Warning signs I can see" with quoted ad text and the fixed wording → "Why am I seeing this ad?" steps, Accounts Center and Ad Library links → "Ask someone you trust" draft. | "An ad promises a miracle. Asih quotes the warning signs it can see, says what it can't tell, and shows Meta's own tools: why this ad, and the Ad Library. It never calls an ad safe." |
-| 2:10–2:30 | **The watch.** At home, her phone is in the other room. | Watch: notice acknowledged → home → she speaks a request → reply: "Appointment help is on your phone. Open Asih and take a photo of the letter." with "You said: …". | "On her watch she just asks. Asih routes the request, and anything that needs a photo stays on her phone." |
-| 2:30–2:40 | Voice note and safety. | **Voice note** → "Use example voice note" → "Transcript (may contain mistakes)" → "Write a reply" → "Open in WhatsApp". Then **Get help — not medical advice**: "This app never calls anyone by itself." | "A voice note becomes large text, and she replies. Get help is always one tap away, and Asih never calls by itself." |
-| 2:40–3:00 | How it works, honestly. | "How the agent worked" trace; Muse Spark 1.3, Muse Wonder 1.0, Muse Voice Transcribe 1.0; evaluation totals from an actual run (see below). | "Under the hood: Muse Spark plans and calls tools, checks its own output, and Voice Transcribe hears her. Our evaluation found a real bug, which we fixed. Here are the numbers, failures included." |
+| 0:00–0:03 | Title | "Asih — a calm AI companion for older adults. Built with Meta Muse models." | Title line: "Asih. A calm AI companion for older adults, built with Meta Muse models." |
+| 0:03–0:21 | `01-intro` | Home: Asih mark, **"Hello, I'm Asih, an AI helper. I'm not a person or a doctor. I can make mistakes. You decide every step."** Large text, EN/ES toggle, **Get help — not medical advice**. Then **Read the data notice again** → **"Before you share"** and the full notice, ending **"I understand."** | What Asih is; it is software, not a person or doctor; every example is synthetic. |
+| 0:21–0:49 | `02-letter` | **Appointment letter** → **"Use example letter"** → **"EXAMPLE (synthetic data)"** → **"Is this information right?"** with Date, Time, Place, Clinic, Who you will see, Phone, What to bring, one at a time; **Confirm** / **Change** → **"Visit saved on this phone."** → **"Download calendar file (.ics)"**. Questions stay editable and verbatim. | Asih reads the example letter, shows each detail large, and waits for one-at-a-time confirmation. Nothing is saved before confirmation. |
+| 0:49–1:17 | `03-invite` | **Find a group and plan to show up** → paste a short synthetic walking-group listing → **"Find activities"** → **"Listing summary"** → confirm **Date**, **Time**, **Place** one at a time → **Continue** → **"Plan for showing up"** checklist, **"You arrange the ride. This app never books rides."** → **"Invite a small group"**, editable **"Open in WhatsApp"** draft. The demo intercepts `window.open` and shows the drafted `wa.me` link and text on screen. | She pastes a listing; Asih summarizes it; she confirms date/time/place; the app drafts an invitation and opens WhatsApp, but never sends it. |
+| 1:17–1:43 | `04-scam` | **Check an ad** → **"Use example ad"** → **"Warning signs I can see"** with quoted ad text → **"Important"** and the fixed wording: **"I can see these warning signs. I can't tell whether this is real or whether the product works. Check with someone you trust before paying or sharing details."** → **"Why am I seeing this ad?"**, Accounts Center, report steps, Ad Library → **"Ask someone you trust"** draft. | Asih quotes warning signs in the ad's own words. It never says "this is a scam"; it says what it cannot know and lets the person decide. |
+| 1:43–2:03 | `05-spanish` | EN → **ES**, then **Revisar un anuncio** → **"Usar anuncio de ejemplo"** → **"Señales de advertencia que puedo ver"** and the fixed Spanish wording: **"Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de su confianza antes de pagar o compartir datos."** Draft: **"¿Puede mirar este anuncio conmigo?"** | Spanish uses formal **usted**. The same fixed warning wording and the same "you decide" rule apply. |
+| 2:03–2:25 | `06-wear` | Slideshow of committed JVM screenshots in `wear/screenshots/` (label them screenshots): notice EN, home EN, settings, notice ES, home ES, reply EN. Reply: **"Appointment help is on your phone."** / **"Open Asih and take a photo of the letter."** with **"You said: …"**. | Wear OS app: ask by voice; anything needing a photo stays on the phone. Voice Transcribe hears her; Muse Wonder gives one retry for hard-to-read images. |
+| 2:25–2:28 | End | "github.com/lovinta/asih" and "MIT". | "Asih is open source under the MIT license." |
 
-## Evaluation numbers
+## Models and privacy lines to cover
 
-Use only totals from an actual run, and label them. The latest **mock-mode** run (Oct 28, 2026; checks code paths and guards, not model quality) passed 70 of 74 cases with 0 failures and 4 skipped photo cases. If a live evaluation is run before recording, show those numbers instead and say which mode they come from. Mock numbers must be labeled "mock mode".
+Use these facts in narration or captions, without overclaiming:
+
+- AI companion for older adults; a few fixed flows, not open chat.
+- Built with Meta Muse models: `muse-spark-1.3` (agent, vision, output
+  guard), `muse-wonder-1.0` (one retry for unreadable images),
+  `muse-voice-transcribe-1.0` (voice notes and the watch).
+- It is an AI, not a doctor; no diagnosis, dose, treatment, or medical advice.
+- It never says "this is a scam" or "this is safe". It shows warning signs and
+  lets the person decide.
+- Calls use `store: false`; saved visits, questions, and notes stay in the
+  browser's localStorage on the phone.
+- If any clip ran in fallback mock mode, say so in that clip's narration:
+  "This clip uses offline mock mode, so the reply is a fixed example, not live
+  model output."
+
+## Backup scene (not in the 2:28 cut)
+
+**Voice note.** **Voice note** → **"Use example voice note"** →
+**"Transcript (may contain mistakes)"** → **"Write a reply"** →
+**"Open in WhatsApp"**. Then **Get help — not medical advice**: **"This app
+never calls anyone by itself."** Use only if time allows or a clip fails.
 
 ## Recording notes
 
-- The watch scene needs a real Wear OS watch on an HTTPS server, or the committed JVM screenshots in `wear/screenshots/` shown as stills (label them "screenshots"). The emulator is not used on the build box.
-- In mock mode the watch transcript is always the example voice note, so the reply is always the appointment message above.
+- Live clips: start `next start` without `MOCK_MODE`; inherit the API key from
+  the environment. Never print or write the key.
+- Record each scene separately so a failed take can be replaced.
+- If a live flow errors, retry once, then fall back to `MOCK_MODE=1` for that
+  clip and label it mock in the narration. Keep total live calls small.
+- The watch scene needs a real Wear OS watch on HTTPS, or use the committed
+  JVM screenshots as stills (as this cut does).
 - The microphone works only on HTTPS or localhost.
-- Record each scene separately so a failed take can be replaced (backup clips).
+- Spanish strings still need a fluent-speaker check before publishing.
 
 ## Cut order (if the limit is shorter)
 
-1. Voice note half of 2:30–2:40 (keep Get help).
-2. The data-notice read-aloud (keep the notice on screen for one second).
-3. Shorten 2:40–3:00 to the trace and the model names.
+1. Drop the title/end narration (keep the cards).
+2. Shorten `06-wear` to three screenshots.
+3. Shorten `02-letter` to the first three confirmed fields.
+4. Shorten `05-spanish` to the fixed Spanish wording only.
 
 ## Open items for Vinta
 
