@@ -2,7 +2,7 @@
 
 This file lists every change made in round one, why it was made, the guideline and reference it follows, and the simulated reviewer(s) who raised it. Guidelines and reference numbers refer to `../older-adults-chatbot-guidelines.md`. Personas and reviews refer to `personas.md` and `reviews.md`.
 
-**Scope kept:** `store: false` is unchanged. No features were added. All runs used `MOCK_MODE=1`; no live calls were made. The `META_API_KEY` environment variable was never read or printed; the persona runner deletes it before loading any agent code.
+**Scope kept:** `store: false` is unchanged. No features were added in round one itself. All runs used `MOCK_MODE=1`; no live calls were made. The `META_API_KEY` environment variable was never read or printed; the persona runner deletes it before loading any agent code.
 
 ## Baseline (before round-one changes)
 
@@ -192,3 +192,8 @@ The repository already followed most of the guidelines: no pet names or exclamat
 - `npx eslint .` — pass.
 - `npx vitest run` — pass (see final summary for counts).
 - Persona transcripts regenerated with `node docs/research/round1/run-personas.mjs` in `MOCK_MODE=1`; baseline copies are in `transcripts/baseline/`, after-revision copies in `transcripts/`.
+
+## Follow-up (Nov 4, approved by Vinta)
+
+- **Scam/ad check guard.** The rule guard now lets through replies that attribute a cure claim to the ad or seller (for example "El anuncio asegura que lo cura", "The ad claims it cures"), so the verdict can be shown live. The agent's own cure or medical claims, including ones attributed to a doctor or other non-ad source, are still blocked. The live guard-check prompt says the same. Live EN and ES scam/ad checks pass (`e2e/live-results/2026-11-04T19-13-04-997Z.json`).
+- **Spanish example event.** Spanish mode now uses a Spanish example event (name, date format, place), still labeled EJEMPLO (datos sintéticos). This replaces the earlier "mock fixtures are English-only" open item.

@@ -88,12 +88,14 @@ What the repository shows (checkable with `git log`):
 - Open-source dependencies are used under their own licenses and are not claimed as our work: Next.js, React, the OpenAI JavaScript SDK (pointed at Meta's API), Vitest, Playwright, and on the watch AndroidX, Jetpack Compose for Wear OS, OkHttp, Robolectric and Roborazzi. See `package.json` and `wear/app/build.gradle.kts`.
 - Model calls use Meta's Model API (Muse Spark 1.3, Muse Wonder 1.0, Muse Voice Transcribe 1.0).
 
-Needs Vinta (placeholders, not yet answered):
+Author's answers:
 
-- TODO (Vinta): Any prior code, designs or research of yours that this builds on, and where the new work starts. Write "None" if there is none.
-- TODO (Vinta): Background research. Do not cite any literature review as your own until you confirm it is yours alone.
-- TODO (Vinta): How to describe AI coding help used to build this (this README already says "This project was built with Muse Code").
-- TODO (Vinta): Team members. The Indie track asks the person who submits to list all team members.
+- **Prior code and designs:** none. All code and design is new work built for this hackathon.
+- **Background research:** Asih's design draws on my own unpublished literature review on designing AI interfaces for older adults (Lovinta Atrinawati, 2026), a spreadsheet of article summaries and design implications that I wrote alone. That spreadsheet is not included in this repository. The round 1 research write-up and simulated persona study made during the hackathon are in [docs/research/](docs/research/).
+- **AI coding help:** This project was built with Muse Code.
+- **Team:** solo, Lovinta Atrinawati.
+
+**Problem statement:** Build for Your World.
 
 ## Known limits and TODOs
 
@@ -102,7 +104,7 @@ Needs Vinta (placeholders, not yet answered):
 - Indonesian support is deferred.
 - There is no deployment. See [docs/DEPLOY.md](docs/DEPLOY.md).
 - Choose the language before starting a flow: switching EN/ES while a result is on screen changes the app's own text, but text the agent already produced stays in the language it ran in.
-- Live mode (with `META_API_KEY`) has not been run against the real Meta Model API yet; only mock mode is tested end to end.
+- Live mode (with `META_API_KEY`) has been run against the real Meta Model API with the opt-in runner `e2e/live.mjs`; run logs are in `e2e/live-results/`. Mock mode is the only mode tested end to end in CI.
 - Not built yet from the plan: passcode, optional check-in and other stretch items. The evaluation set is in [`eval/`](eval/README.md).
 - Muse Image is not used yet (the plan names no feature for it).
 

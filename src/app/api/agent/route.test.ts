@@ -54,4 +54,22 @@ describe("/api/agent auto routing", () => {
     const response = await POST(request("auto"));
     expect(response.status).toBe(400);
   });
+  it("returns the Spanish example event when lang is es", async () => {
+    vi.stubEnv("MOCK_MODE", "1");
+    const response = await POST(
+      new Request("http://localhost/api/agent", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          flow: "B",
+          lang: "es",
+          input: { interest: "walking", useExample: true },
+        }),
+      }),
+    );
+    const body = await response.json();
+    expect(response.status).toBe(200);
+    expect(body.result.event.name).toContain("EJEMPLO");
+    expect(body.result.event.date).toBe("sábado, 7 de noviembre de 2026");
+  });
 });

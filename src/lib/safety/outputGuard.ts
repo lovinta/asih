@@ -34,15 +34,51 @@ const BLOCKED: { pattern: RegExp; reason: string }[] = [
 ];
 
 // Quoted spans are ad text quoted as evidence, not the agent's own words, so
-// they are stripped before the rules run. The fixed scam wording itself and
-// quoted cue evidence shown as quotes always pass; only the agent's own
-// claims and verdicts can fail.
+// they are stripped before the rules run. Accepts straight quotes, curly
+// quotes, and guillemets. The fixed scam wording itself and quoted cue
+// evidence shown as quotes always pass; only the agent's own claims and
+// verdicts can fail.
 function stripQuotedSpans(text: string): string {
-  return text.replace(/"[^"]*"/g, " ").replace(/'[^']*'/g, " ");
+  return text
+    .replace(/"[^"]*"/g, " ")
+    .replace(/“[^”]*”/g, " ")
+    .replace(/«[^»]*»/g, " ")
+    .replace(/‘[^’]*’/g, " ")
+    .replace(/'[^']*'/g, " ");
+}
+
+// A flow C reply is supposed to report the ad's claims as warning signs, for
+// example "The ad says it cures..." or "El anuncio dice que cura". Remove only
+// the attributed claim span before the rules run, so the agent's own claim in
+// the same sentence ("...but this cures arthritis") is still checked.
+const REPORTED_CLAIM_PATTERNS: RegExp[] = [
+  // English: the ad says/claims/promises [that] it cures / this product works.
+  /\b(?:the|this|that|an?)\s+(?:ad|advert|advertisement|listing|post)\b[^.!?;,\n]*?\b(?:says?|claims?|promised?|promises?|states?|suggests?|mentions?|advertises?)\b[^.!?;,\n]*?\b(?:cures?|works?|heals?|treats?)\b/gi,
+  // English: claims to cure, promises a cure, promise of a cure.
+  /\b(?:claims?|promised?|promises?)\s+(?:to\s+|of\s+)?(?:a\s+|the\s+)?(?:miracle\s+)?cure\b/gi,
+  // English: "cure claim(s)".
+  /\bcure[-\s]+claims?\b/gi,
+  // Spanish: el anuncio dice/afirma/promete ... cura/curar/funciona.
+  /\b(?:el|este|ese|un)\s+anuncio\b[^.!?;,\n]*?\b(?:dice|afirma|promete|sostiene|indica|menciona|señala)\b[^.!?;,\n]*?\b(?:cura|curan|curar|curación|funciona)\b/gi,
+  // Spanish: promete curar.
+  /\bpromete\s+(?:que\s+)?(?:cura|curan|curar)\b/gi,
+  // Ad-anchored, comma-free gaps: the claim must be attributed to the ad or seller.
+  /\b(?:anuncio|vendedor|publicidad)\b[^.!?;,\n]{0,40}?\b(?:dice|dicen|afirma|afirman|asegura|aseguran|promete|prometen|garantiza|sostiene|anuncia|presume)\b[^.!?;,\n]{0,60}?\b(?:cura|curan|curar|curación)\b/gi,
+  /\bseg[uú]n\s+(?:el|este|ese)\s+anuncio,?\s+[^.!?;,\n]{0,60}?\b(?:cura|curan|curar)\b/gi,
+  /\b(?:ad|advert|advertisement|seller|listing|it)\b[^.!?;,\n]{0,40}?\b(?:says?|claims?|promises?|guarantees?|states?|advertises?)\b[^.!?;,\n]{0,60}?\bcures?\b/gi,
+  // Spanish: afirmaciones/promesas de cura.
+  /\b(?:afirmaciones?|promesas?)\s+de\s+(?:cura|curar|curación)\b/gi,
+];
+
+function stripReportedClaims(text: string): string {
+  return REPORTED_CLAIM_PATTERNS.reduce(
+    (remaining, pattern) => remaining.replace(pattern, " "),
+    text,
+  );
 }
 
 export function ruleGuard(text: string): GuardResult {
-  const ownWords = stripQuotedSpans(text);
+  const ownWords = stripReportedClaims(stripQuotedSpans(text));
   const reasons = BLOCKED.filter((b) => b.pattern.test(ownWords)).map(
     (b) => b.reason,
   );

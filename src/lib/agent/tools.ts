@@ -8,7 +8,7 @@
 // below run in mock mode only.
 
 import { EXAMPLE_LETTER_FIELDS, type LetterField } from "@/fixtures/letter";
-import { EXAMPLE_EVENT } from "@/fixtures/event";
+import { exampleEventFor } from "@/fixtures/event";
 import { EXAMPLE_AD_TEXT, EXAMPLE_ADVERTISER } from "@/fixtures/ad";
 import {
   whatsappShareUrl,
@@ -536,6 +536,7 @@ export async function executeTool(
 ): Promise<unknown> {
   const t = strings(lang);
   const mock = isMockMode();
+  const exampleEvent = exampleEventFor(lang);
   switch (name) {
     case "read_document": {
       if (args.example || (!args.imageDataUrl && !args.text)) {
@@ -575,9 +576,9 @@ export async function executeTool(
         }
         return {
           summary: {
-            source: `${t.flowB.sharedSource} (synthetic in demo)`,
-            name: EXAMPLE_EVENT.name,
-            date: EXAMPLE_EVENT.date,
+            source: `${t.flowB.sharedSource} (${t.flowB.syntheticInDemo})`,
+            name: exampleEvent.name,
+            date: exampleEvent.date,
           },
         };
       }
@@ -594,21 +595,21 @@ export async function executeTool(
         calendars: t.flowB.calendarTypes,
       };
       // Fixture events only in mock/example mode, never live.
-      if (mock || args.example) result.example = EXAMPLE_EVENT;
+      if (mock || args.example) result.example = exampleEvent;
       return result;
     }
     case "plan_showing_up": {
-      const place = String(args.place ?? (mock ? EXAMPLE_EVENT.place : ""));
+      const place = String(args.place ?? (mock ? exampleEvent.place : ""));
       const bring = Array.isArray(args.bring)
         ? (args.bring as unknown[]).filter((b): b is string => typeof b === "string")
         : mock
-          ? EXAMPLE_EVENT.bring
+          ? exampleEvent.bring
           : [];
       const startPoint =
         typeof args.startPoint === "string"
           ? args.startPoint
           : mock
-            ? EXAMPLE_EVENT.startPoint
+            ? exampleEvent.startPoint
             : "";
       return {
         checklist: { bring, startPoint },
@@ -623,10 +624,10 @@ export async function executeTool(
         ? (args.names as unknown[]).filter((n): n is string => typeof n === "string")
         : [];
       const useExample = Boolean(args.example) || mock;
-      const eventName = String(args.eventName ?? (useExample ? EXAMPLE_EVENT.name : ""));
-      const date = String(args.date ?? (useExample ? EXAMPLE_EVENT.date : ""));
-      const time = String(args.time ?? (useExample ? EXAMPLE_EVENT.time : ""));
-      const place = String(args.place ?? (useExample ? EXAMPLE_EVENT.place : ""));
+      const eventName = String(args.eventName ?? (useExample ? exampleEvent.name : ""));
+      const date = String(args.date ?? (useExample ? exampleEvent.date : ""));
+      const time = String(args.time ?? (useExample ? exampleEvent.time : ""));
+      const place = String(args.place ?? (useExample ? exampleEvent.place : ""));
       const draft = fillTemplate(t.flowB.inviteTemplate, {
         names: names.length > 0 ? ` ${names.join(", ")}` : "",
         event: eventName,

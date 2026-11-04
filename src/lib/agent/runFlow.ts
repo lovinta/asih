@@ -24,7 +24,7 @@ import type {
   Step,
 } from "./types";
 import type { LetterField } from "@/fixtures/letter";
-import { EXAMPLE_EVENT } from "@/fixtures/event";
+import { exampleEventFor } from "@/fixtures/event";
 import { EXAMPLE_AD_TEXT, EXAMPLE_ADVERTISER } from "@/fixtures/ad";
 import { redFlagPrescreen } from "../safety/prescreen";
 import { outputGuard } from "../safety/outputGuard";
@@ -124,6 +124,7 @@ export function fillArgs(
   args: Record<string, unknown>,
   input: FlowInput,
   ctx: Ctx,
+  lang: Lang = "en",
 ): Record<string, unknown> {
   if (name === "scam_cues" && !args.adText) return { ...args, adText: ctx.adText };
   if (name === "explain_ad" && !args.advertiser)
@@ -165,9 +166,10 @@ export function fillArgs(
         }
       : {};
     // Fixture defaults only in mock mode; live uses the shared listing.
+    const exampleEvent = exampleEventFor(lang);
     const mockFallback =
       !ctx.event && isMockMode()
-        ? { eventName: EXAMPLE_EVENT.name, place: EXAMPLE_EVENT.place }
+        ? { eventName: exampleEvent.name, place: exampleEvent.place }
         : {};
     return { ...fromEvent, ...mockFallback, ...args };
   }
@@ -182,7 +184,7 @@ export function fillArgs(
         }
       : {};
     const mockFallback =
-      !ctx.event && isMockMode() ? { eventName: EXAMPLE_EVENT.name } : {};
+      !ctx.event && isMockMode() ? { eventName: exampleEventFor(lang).name } : {};
     return { ...fromEvent, ...mockFallback, ...args };
   }
   return args;
@@ -267,7 +269,7 @@ export async function liveGuardCheck(text: string, lang: Lang): Promise<{ pass: 
             type: "message",
             role: "user",
             content:
-              `Reply with JSON {"pass": boolean}. Pass means: no diagnosis, treatment, dose, efficacy/cure claim, and no verdict that something is safe or a scam.\n${dataBlock(text)}`,
+              `You check replies from a scam-warning helper for older adults; the reply may be in English or Spanish. Reply with JSON {"pass": boolean}. Pass ordinary warning-sign lists, explanations of why an ad may target someone, statements that the helper cannot tell whether the ad is real or the product works, advice to check with a trusted person, and draft notes to a trusted person. Pass when the reply reports, quotes, or attributes the ad's own claims as warning signs, including "The ad says it cures...", "claims to cure", "promises a cure", Spanish "el anuncio dice que cura", "promete curar", or "afirma que cura", with straight, curly, or guillemet quotes. Fail the agent's own diagnosis, treatment, dose, medical advice, efficacy/cure claim, or verdict that something is safe or a scam; quoted text must not hide the agent's own claims or verdicts.\n${dataBlock(text)}`,
           },
         ],
         text: {
@@ -304,15 +306,16 @@ function outputGuardSummary(guard: { pass: boolean; reasons: string[] }): string
   return isMockMode() ? "Rules only (mock mode)." : "Rules plus live check.";
 }
 
-function exampleEventSummary(): SharedEventSummary {
+function exampleEventSummary(lang: Lang): SharedEventSummary {
+  const event = exampleEventFor(lang);
   return {
-    name: EXAMPLE_EVENT.name,
-    date: EXAMPLE_EVENT.date,
-    time: EXAMPLE_EVENT.time,
-    place: EXAMPLE_EVENT.place,
-    source: EXAMPLE_EVENT.source,
-    bring: [...EXAMPLE_EVENT.bring],
-    startPoint: EXAMPLE_EVENT.startPoint,
+    name: event.name,
+    date: event.date,
+    time: event.time,
+    place: event.place,
+    source: event.source,
+    bring: [...event.bring],
+    startPoint: event.startPoint,
   };
 }
 
@@ -449,7 +452,7 @@ export async function runFlow(
       if (callItem.type !== "function_call") continue;
       const result = await executeTool(
         callItem.name,
-        fillArgs(callItem.name, parseArgs(callItem.arguments), input, ctx),
+        fillArgs(callItem.name, parseArgs(callItem.arguments), input, ctx, lang),
         lang,
       );
       outputs[callItem.name] = result;
@@ -479,7 +482,7 @@ export async function runFlow(
           };
         } else if (isMockMode()) {
           const example = (result as { example?: unknown }).example;
-          if (example) ctx.event = exampleEventSummary();
+          if (example) ctx.event = exampleEventSummary(lang);
         }
       }
       replay.push({
@@ -554,7 +557,7 @@ async function finish(
       ok: guard.pass,
     });
     // Fixture events only in mock mode; live uses the shared listing summary.
-    const event = ctx.event ?? (isMockMode() ? exampleEventSummary() : null);
+    const event = ctx.event ?? (isMockMode() ? exampleEventSummary(lang) : null);
     // The event's date/time/place confirm exactly like Flow A, one at a time.
     const confirm = createConfirmState(
       event

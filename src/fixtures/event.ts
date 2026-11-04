@@ -27,3 +27,23 @@ export const EXAMPLE_EVENT: ExampleEvent = {
   ],
   startPoint: "Meet at the Riverside Park main gate sign.",
 };
+
+// Spanish mode variant. Still synthetic and labeled as an example.
+export const EXAMPLE_EVENT_ES: ExampleEvent = {
+  label: "EJEMPLO (datos sintéticos)",
+  name: "Caminantes Matutinos del Parque Riverside — EJEMPLO",
+  source: "Anuncio de ejemplo del tablón comunitario (sintético)",
+  date: "sábado, 7 de noviembre de 2026",
+  time: "9:00 AM",
+  place: "Puerta principal del Parque Riverside, Riverton",
+  bring: [
+    "Zapatos cómodos para caminar",
+    "Una botella de agua",
+    "Una chaqueta ligera",
+  ],
+  startPoint: "Nos reunimos en el cartel de la puerta principal del Parque Riverside.",
+};
+
+export function exampleEventFor(lang: "en" | "es"): ExampleEvent {
+  return lang === "es" ? EXAMPLE_EVENT_ES : EXAMPLE_EVENT;
+}

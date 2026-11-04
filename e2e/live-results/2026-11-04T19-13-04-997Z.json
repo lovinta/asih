@@ -1,0 +1,52 @@
+{
+  "selectedFlows": [
+    "scam_ad_en",
+    "scam_ad_es"
+  ],
+  "flows": [
+    {
+      "name": "scam_ad_en",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 5230,
+        "output": 5404
+      },
+      "estimatedCostUsd": 0.0295045,
+      "outputExcerpt": "Message: I read the paid message from EverFlex Labs. Do you want the warning signs, the steps to check it, or a note you can share. I can see these warning signs. I can't tell whether this is real or whether the product…"
+    },
+    {
+      "name": "scam_ad_es",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 4704,
+        "output": 5070
+      },
+      "estimatedCostUsd": 0.0274275,
+      "outputExcerpt": "Message: Soy inteligencia artificial. ¿Usted quiere que muestre las frases marcadas del anuncio? Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de …"
+    }
+  ],
+  "totals": {
+    "calls": 6,
+    "tokenCounts": {
+      "input": 9934,
+      "output": 10474
+    },
+    "estimatedCostUsd": 0.056932
+  }
+}

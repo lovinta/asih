@@ -94,6 +94,7 @@ export const es: Strings = {
     transportTitle: "Cómo llegar",
   },
   flowB: {
+    syntheticInDemo: "sintético en la demo",
     title: "Encontrar un grupo y asistir",
     interestLabel: "¿Qué le gusta hacer?",
     interestHint:

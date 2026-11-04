@@ -1,0 +1,52 @@
+{
+  "selectedFlows": [
+    "scam_ad_en",
+    "scam_ad_es"
+  ],
+  "flows": [
+    {
+      "name": "scam_ad_en",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 1697,
+        "output": 4959
+      },
+      "estimatedCostUsd": 0.023197,
+      "outputExcerpt": "Message: I read the ad from EverFlex Labs with three pain claims. Would you like warning signs, an explanation of why you see it, or a draft note to a person you trust. I can see these warning signs. I can't tell whethe…"
+    },
+    {
+      "name": "scam_ad_es",
+      "pass": false,
+      "notes": [
+        "guard blocked",
+        "guard reason: Blocked: live-check."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 4623,
+        "output": 7431
+      },
+      "estimatedCostUsd": 0.0373605,
+      "outputExcerpt": "Message: Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de su confianza antes de pagar o compartir datos."
+    }
+  ],
+  "totals": {
+    "calls": 5,
+    "tokenCounts": {
+      "input": 6320,
+      "output": 12390
+    },
+    "estimatedCostUsd": 0.0605575
+  }
+}

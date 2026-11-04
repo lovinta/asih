@@ -1,0 +1,52 @@
+{
+  "selectedFlows": [
+    "scam_ad_en",
+    "scam_ad_es"
+  ],
+  "flows": [
+    {
+      "name": "scam_ad_en",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 4614,
+        "output": 6857
+      },
+      "estimatedCostUsd": 0.03490975,
+      "outputExcerpt": "Message: I am AI software. I am unsure what you need, so do you want patterns, steps, or a share note. I can see these warning signs. I can't tell whether this is real or whether the product works. Check with someone yo…"
+    },
+    {
+      "name": "scam_ad_es",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 4496,
+        "output": 4860
+      },
+      "estimatedCostUsd": 0.026275,
+      "outputExcerpt": "Message: Veo varias frases que piden atención de usted. ¿Quiere que explique por qué ve usted este aviso o que prepare una nota para una persona de confianza? Puedo ver estas señales de advertencia. No puedo decir si es…"
+    }
+  ],
+  "totals": {
+    "calls": 6,
+    "tokenCounts": {
+      "input": 9110,
+      "output": 11717
+    },
+    "estimatedCostUsd": 0.06118475
+  }
+}

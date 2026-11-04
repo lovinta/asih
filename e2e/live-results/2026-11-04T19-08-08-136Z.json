@@ -1,0 +1,34 @@
+{
+  "selectedFlows": [
+    "scam_ad_es"
+  ],
+  "flows": [
+    {
+      "name": "scam_ad_es",
+      "pass": false,
+      "notes": [
+        "guard blocked",
+        "guard reason: Blocked: live-check."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 4611,
+        "output": 5936
+      },
+      "estimatedCostUsd": 0.03099175,
+      "outputExcerpt": "Message: Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Consulte con alguien de su confianza antes de pagar o compartir datos."
+    }
+  ],
+  "totals": {
+    "calls": 3,
+    "tokenCounts": {
+      "input": 4611,
+      "output": 5936
+    },
+    "estimatedCostUsd": 0.03099175
+  }
+}

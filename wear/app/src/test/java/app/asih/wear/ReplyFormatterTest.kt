@@ -6,12 +6,19 @@ import org.junit.Test
 class ReplyFormatterTest {
     // Sample Flow B runFlow JSON using the synthetic mock fixture from src/fixtures/event.ts.
     private val mockB = """{"trace":[{"tool":"find_activities","summary":"find_activities done.","ok":true},{"tool":"plan_showing_up","summary":"plan_showing_up done.","ok":true},{"tool":"draft_invite","summary":"draft_invite done.","ok":true},{"tool":"output_guard","summary":"Rules only (mock mode).","ok":true}],"result":{"kind":"B","event":{"name":"Riverside Morning Walkers — EXAMPLE","date":"Saturday, November 7, 2026","time":"9:00 AM","place":"Riverside Park main gate, Riverton","source":"Example community board listing (synthetic)","bring":["Comfortable walking shoes","A bottle of water","A light jacket"],"startPoint":"Meet at the Riverside Park main gate sign."},"confirm":{"items":[{"id":"date-0","field":"date","value":"Saturday, November 7, 2026","readable":true,"status":"pending"},{"id":"time-0","field":"time","value":"9:00 AM","readable":true,"status":"pending"},{"id":"place-0","field":"place","value":"Riverside Park main gate, Riverton","readable":true,"status":"pending"}]},"activities":{},"plan":{},"invite":{},"ics":null},"history":[]}"""
+    private val mockBEs = """{"trace":[{"tool":"find_activities","summary":"find_activities done.","ok":true},{"tool":"plan_showing_up","summary":"plan_showing_up done.","ok":true},{"tool":"draft_invite","summary":"draft_invite done.","ok":true},{"tool":"output_guard","summary":"Rules only (mock mode).","ok":true}],"result":{"kind":"B","event":{"name":"Caminantes Matutinos del Parque Riverside — EJEMPLO","date":"sábado, 7 de noviembre de 2026","time":"9:00 AM","place":"Puerta principal del Parque Riverside, Riverton","source":"Anuncio de ejemplo del tablón comunitario (sintético)","bring":["Zapatos cómodos para caminar","Una botella de agua","Una chaqueta ligera"],"startPoint":"Nos reunimos en el cartel de la puerta principal del Parque Riverside."},"confirm":{"items":[{"id":"date-0","field":"date","value":"sábado, 7 de noviembre de 2026","readable":true,"status":"pending"},{"id":"time-0","field":"time","value":"9:00 AM","readable":true,"status":"pending"},{"id":"place-0","field":"place","value":"Puerta principal del Parque Riverside, Riverton","readable":true,"status":"pending"}]},"activities":{},"plan":{},"invite":{},"ics":null},"history":[]}"""
     private val mockHelp = """{"trace":[],"result":{"kind":"help","matched":"chest pain"},"history":[]}"""
     private fun appointment(date: String = "Tuesday, November 10, 2026", time: String = "2:00 PM") = """{"result":{"kind":"A","confirm":{"items":[{"field":"date","value":"$date","readable":true},{"field":"time","value":"$time","readable":true}]}}}"""
     @Test fun formatsMockEvent() {
         val reply = formatReply(mockB, false)
         assertEquals("Riverside Morning Walkers — EXAMPLE", reply.line1)
         assertEquals("Saturday, November 7, 2026, 9:00 AM", reply.line2)
+    }
+    @Test fun formatsSpanishMockEvent() {
+        val reply = formatReply(mockBEs, true)
+        assertEquals("Caminantes Matutinos del Parque Riverside — EJEMPLO", reply.line1)
+        assertEquals("sábado, 7 de noviembre de 2026, 9:00 AM", reply.line2)
+        assertTrue(reply.showFullDetails)
     }
     @Test fun formatsEmergencyWithoutCalling() {
         val reply = formatReply(mockHelp, true)

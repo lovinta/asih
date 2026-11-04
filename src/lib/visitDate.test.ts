@@ -22,6 +22,15 @@ describe("parseVisitDateTime", () => {
     expect(date?.getHours()).toBe(9);
   });
 
+  it("parses the Spanish example event date", () => {
+    const date = parseVisitDateTime("sábado, 7 de noviembre de 2026", "9:00 AM");
+    expect(date).not.toBeNull();
+    expect(date?.getFullYear()).toBe(2026);
+    expect(date?.getMonth()).toBe(10);
+    expect(date?.getDate()).toBe(7);
+    expect(date?.getHours()).toBe(9);
+  });
+
   it("handles PM times", () => {
     const date = parseVisitDateTime("November 10, 2026", "2:15 PM");
     expect(date?.getHours()).toBe(14);

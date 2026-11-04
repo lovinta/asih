@@ -11,6 +11,7 @@ import {
 } from "../safety/scamWording";
 import { PROMPT_INJECTION_AD_TEXT } from "@/fixtures/injectionAd";
 import { EXAMPLE_AD_TEXT } from "@/fixtures/ad";
+import { EXAMPLE_EVENT_ES } from "@/fixtures/event";
 import { createConfirmState, confirmItem } from "../confirm";
 import { ACCOUNTS_CENTER_AD_PREFS_URL } from "../links";
 import { es as esStrings } from "@/i18n/es";
@@ -79,18 +80,31 @@ describe("Flow B (find a group)", () => {
     );
   });
 
-  it("uses Spanish strings for Spanish plan and invite output", async () => {
+  it("uses the Spanish example event in Spanish mode", async () => {
     const { result } = await runFlow(
       "B",
       { interest: "walking", place: "Riverton" },
       "es",
     );
     const b = result as FlowBResult;
+    expect(b.event).toMatchObject({
+      name: EXAMPLE_EVENT_ES.name,
+      date: EXAMPLE_EVENT_ES.date,
+      place: EXAMPLE_EVENT_ES.place,
+      source: EXAMPLE_EVENT_ES.source,
+    });
+    expect(b.event?.name).toContain("EJEMPLO");
+    expect(b.event?.date).toBe("sábado, 7 de noviembre de 2026");
+    expect(b.confirm.items.find((i) => i.field === "date")?.value).toBe(
+      EXAMPLE_EVENT_ES.date,
+    );
     const plan = b.plan as { rideNote: string; meetTips: string };
     expect(plan.rideNote).toBe(esStrings.flowB.rideNote);
     expect(plan.meetTips).toBe(esStrings.flowB.meetTips);
     const invite = b.invite as { draft: string };
     expect(invite.draft).toContain("Le invito al grupo");
+    expect(invite.draft).toContain(EXAMPLE_EVENT_ES.name);
+    expect(invite.draft).toContain(EXAMPLE_EVENT_ES.date);
     expect(invite.draft).toContain("Avíseme si le gustaría venir");
   });
 

@@ -89,6 +89,7 @@ export const en = {
     transportTitle: "Getting there",
   },
   flowB: {
+    syntheticInDemo: "synthetic in demo",
     title: "Find a group and plan to show up",
     interestLabel: "What do you enjoy?",
     interestHint:

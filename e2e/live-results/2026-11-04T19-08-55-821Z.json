@@ -1,0 +1,32 @@
+{
+  "selectedFlows": [
+    "scam_ad_es"
+  ],
+  "flows": [
+    {
+      "name": "scam_ad_es",
+      "pass": true,
+      "notes": [
+        "HTTP flow completed and app guard behavior was verified."
+      ],
+      "models": [
+        "muse-spark-1.3",
+        "muse-spark-1.3"
+      ],
+      "tokenCounts": {
+        "input": 1754,
+        "output": 4034
+      },
+      "estimatedCostUsd": 0.019337,
+      "outputExcerpt": "Message: Leí el texto del anuncio de EverFlex Labs. ¿Desea que miremos con calma las partes que pueden mostrar riesgo? Puedo ver estas señales de advertencia. No puedo decir si esto es real o si el producto funciona. Co…"
+    }
+  ],
+  "totals": {
+    "calls": 2,
+    "tokenCounts": {
+      "input": 1754,
+      "output": 4034
+    },
+    "estimatedCostUsd": 0.019337
+  }
+}
